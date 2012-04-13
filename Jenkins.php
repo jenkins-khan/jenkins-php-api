@@ -12,7 +12,7 @@ class Jenkins
    * @var null
    */
   private $jenkins = null;
-  
+
   /**
    * @param string $baseUrl
    */
@@ -46,10 +46,10 @@ class Jenkins
         return false;
       }
     }
-    
+
     return true;
   }
-  
+
   /**
    * @return void
    * @throws RuntimeException
@@ -60,9 +60,9 @@ class Jenkins
     {
       return;
     }
-    
+
     $curl = curl_init($this->baseUrl . '/api/json');
-    
+
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     $ret = curl_exec($curl);
 
@@ -76,7 +76,7 @@ class Jenkins
       throw new RunTimeException('Error during json_decode');
     }
   }
-  
+
   /**
    * @throws RuntimeException
    * @return array
@@ -84,7 +84,7 @@ class Jenkins
   public function getAllJobs()
   {
     $this->initialize();
-    
+
     $jobs = array();
     foreach ($this->jenkins->jobs as $job)
     {
@@ -92,10 +92,10 @@ class Jenkins
         'name' => $job->name
       );
     }
-    
+
     return $jobs;
   }
-  
+
   /**
    * @param string $computer
    * @return array
@@ -104,7 +104,7 @@ class Jenkins
   public function getExecutors($computer = '(master)')
   {
     $this->initialize();
-    
+
     $executors = array();
     for ($i = 0; $i <  $this->jenkins->numExecutors ; $i++)
     {
@@ -123,7 +123,7 @@ class Jenkins
       {
         throw new RunTimeException('Error during json_decode');
       }
-     
+
       $executors[] = new Jenkins_Executor($infos, $computer, $this);
     }
 
@@ -138,22 +138,22 @@ class Jenkins
   public function launchJob($jobName, $parameters)
   {
     $url   = sprintf('%s/job/%s/buildWithParameters', $this->baseUrl, $jobName);
-    
+
     $curl = curl_init($url);
-    
+
     curl_setopt($curl, CURLOPT_POST, 1);
     curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($parameters));
 
     curl_exec($curl);
-    
+
     if (curl_errno($curl))
     {
       throw new RuntimeException(sprintf('Error trying to launch job "%s" (%s)', $parameters['name'], $url));
     }
-    
+
     return true;
   }
-  
+
   /**
    * @param $jobName
    * @throws RuntimeException
@@ -175,7 +175,7 @@ class Jenkins
     {
       throw new RunTimeException('Error during json_decode');
     }
-   
+
     return new Jenkins_Job($infos, $this);
   }
 
@@ -210,13 +210,13 @@ class Jenkins
   public function getViews()
   {
     $this->initialize();
-    
+
     $views = array();
     foreach ($this->jenkins->views as $view)
     {
       $views[] = $this->getView($view->name);
     }
-    
+
     return $views;
   }
 
@@ -227,16 +227,16 @@ class Jenkins
   {
     $this->initialize();
     $primaryView = null;
-    
+
     if (property_exists($this->jenkins, 'primaryView'))
     {
       $primaryView = $this->getView($this->jenkins->primaryView->name);
     }
-    
+
     return $primaryView;
   }
-  
-  
+
+
   /**
    * @param string $viewName
    * @return Jenkins_View
@@ -259,7 +259,7 @@ class Jenkins
     {
       throw new RunTimeException('Error during json_decode');
     }
-   
+
     return new Jenkins_View($infos, $this);
   }
 
@@ -289,7 +289,7 @@ class Jenkins
       throw new RuntimeException(sprintf('Error during getting information for build %s#%d on %s', $job, $buildId, $this->baseUrl));
     }
     $infos = json_decode($ret);
-    
+
     if (!$infos instanceof stdClass)
     {
       return null;
@@ -297,7 +297,7 @@ class Jenkins
 
     return new Jenkins_Build($infos, $this);
   }
-  
+
   /**
    * @param string $job
    * @param int $buildId
@@ -305,7 +305,7 @@ class Jenkins
    */
   public function getUrlBuild($job, $buildId)
   {
-    return (null === $buildId) ? 
+    return (null === $buildId) ?
         $this->getUrlJob($job)
       : sprintf('%s/job/%s/%d', $this->baseUrl, $job, $buildId)
     ;
@@ -318,7 +318,7 @@ class Jenkins
   {
     return $this->baseUrl;
   }
-  
+
   /**
    * @param string $job
    * @return string
@@ -327,7 +327,19 @@ class Jenkins
   {
     return sprintf('%s/job/%s', $this->baseUrl, $job);
   }
-  
+
+  /**
+   * getUrlView
+   *
+   * @param string $view
+
+   * @return string
+   */
+  public function getUrlView($view)
+  {
+    return sprintf('%s/view/%s', $this->baseUrl, $view);
+  }
+
   /**
    * @param string $jobname
    *
@@ -364,7 +376,7 @@ class Jenkins
       throw new RuntimeException(sprintf('Error during setting configuration for job %s', $jobname));
     }
   }
-  
+
   /**
    * @param Jenkins_Executor $executor
    * @throws RuntimeException
