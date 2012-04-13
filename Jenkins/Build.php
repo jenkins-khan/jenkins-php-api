@@ -121,7 +121,7 @@ class Jenkins_Build
   {
     $duration = null;
     $progress = $this->getProgress();
-    if (null !== $progress && $progress !== 0)
+    if (null !== $progress && $progress >= 0)
     {
       $duration = ceil((time() - $this->getTimestamp()) / ($progress/100));
     }
