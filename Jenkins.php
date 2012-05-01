@@ -272,7 +272,7 @@ class Jenkins
    * @return Jenkins_Build
    * @throws RuntimeException
    */
-  public function getBuild($job, $buildId, $tree = 'actions[parameters,parameters[name,value]],result,duration,timestamp,number,url')
+  public function getBuild($job, $buildId, $tree = 'actions[parameters,parameters[name,value]],result,duration,timestamp,number,url,estimatedDuration')
   {
     if ($tree !== null)
     {

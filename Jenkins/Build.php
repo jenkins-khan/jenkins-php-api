@@ -119,6 +119,19 @@ class Jenkins_Build
    */
   public function getEstimatedDuration()
   {
+    //since version 1.461 estimatedDuration is displayed in jenkins's api
+    //we can use it witch is more accurate than calcule ourselves
+    //but older versions need to continue to work, so in case of estimated
+    //duration is not found we fallback to calcule it.
+    if (property_exists($this->build, 'estimatedDuration'))
+    {
+      $estimatedDuration = $this->build->estimatedDuration;
+      if ($estimatedDuration > 0)
+      {
+        return $estimatedDuration / 1000;
+      }
+    }
+
     $duration = null;
     $progress = $this->getProgress();
     if (null !== $progress && $progress >= 0)
