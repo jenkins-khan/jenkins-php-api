@@ -125,11 +125,7 @@ class Jenkins_Build
     //duration is not found we fallback to calcule it.
     if (property_exists($this->build, 'estimatedDuration'))
     {
-      $estimatedDuration = $this->build->estimatedDuration;
-      if ($estimatedDuration > 0)
-      {
-        return $estimatedDuration / 1000;
-      }
+      return $this->build->estimatedDuration;
     }
 
     $duration = null;
