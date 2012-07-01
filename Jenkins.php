@@ -378,6 +378,31 @@ class Jenkins
   }
 
   /**
+   * @param string $jobname
+   * @param string $xmlConfiguration
+   *
+   * @return void
+   */
+  public function createJob($jobname, $xmlConfiguration)
+  {
+    $url  = sprintf('%s/createItem?name=%s', $this->baseUrl, $jobname);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $xmlConfiguration);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_exec($curl);
+    if (curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200)
+    {
+      throw new InvalidArgumentException(sprintf('Job %s already exists', $jobname));
+    }
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException(sprintf('Error creating job %s', $jobname));
+    }
+  }
+
+  /**
    * @param Jenkins_Executor $executor
    * @throws RuntimeException
    */
