@@ -135,9 +135,16 @@ class Jenkins
    * @return bool
    * @throws RuntimeException
    */
-  public function launchJob($jobName, $parameters)
+  public function launchJob($jobName, $parameters = array())
   {
-    $url   = sprintf('%s/job/%s/buildWithParameters', $this->baseUrl, $jobName);
+    if (0 === count($parameters))
+    {
+      $url = sprintf('%s/job/%s/build', $this->baseUrl, $jobName);
+    }
+    else
+    {
+      $url = sprintf('%s/job/%s/buildWithParameters', $this->baseUrl, $jobName);
+    }
 
     $curl = curl_init($url);
 
