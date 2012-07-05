@@ -187,6 +187,27 @@ class Jenkins
   }
 
   /**
+   * @param string $jobName
+   *
+   * @return void
+   */
+  public function deleteJob($jobName)
+  {
+    $url  = sprintf('%s/job/%s/doDelete', $this->baseUrl, $jobName);
+    $curl = curl_init($url);
+
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_POST, 1);
+
+    $ret = curl_exec($curl);
+
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException(sprintf('Error deleting job %s on %s', $jobName, $this->baseUrl));
+    }
+  }
+
+  /**
    * @return Jenkins_Queue
    * @throws RuntimeException
    */
