@@ -467,5 +467,17 @@ class Jenkins
   }
 
 
+  /**
+   * @param Jenkins_Build $build
+   *
+   * @return string
+   */
+  public function getConsoleTextBuild(Jenkins_Build $build)
+  {
+    $url  = sprintf('%s/consoleText', $build->getUrl());
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    return curl_exec($curl);
+  }
 
 }
