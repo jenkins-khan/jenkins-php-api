@@ -249,4 +249,13 @@ class Jenkins_Build
 
     return $this;
   }
+  /**
+   *
+   * @return string
+   */
+  public function getConsoleText()
+  {
+    return $this->getJenkins()->getConsoleTextBuild($this);
+  }
+
 }
