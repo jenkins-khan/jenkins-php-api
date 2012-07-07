@@ -1,0 +1,86 @@
+<?php
+
+class Jenkins_Computer
+{
+
+  /**
+   * @var stdClass
+   */
+  private $computer;
+
+  /**
+   * @var Jenkins
+   */
+  private $jenkins;
+
+
+  /**
+   * @param stdClass $computer
+   * @param Jenkins  $jenkins
+   */
+  public function __construct($computer, Jenkins $jenkins)
+  {
+    $this->computer = $computer;
+    $this->setJenkins($jenkins);
+  }
+
+  /**
+   * @return string
+   */
+  public function getName()
+  {
+    return $this->computer->displayName;
+  }
+
+  /**
+   *
+   * @return bool
+   */
+  public function isOffline()
+  {
+    return (bool)$this->computer->offline;
+  }
+
+  /**
+   *
+   * @return Jenkins_Computer
+   */
+  public function toggleOffline()
+  {
+    $this->getJenkins()->toggleOfflineComputer($this->getName());
+
+    return $this;
+  }
+
+  /**
+   *
+   * @return Jenkins_Computer
+   */
+  public function delete()
+  {
+    $this->getJenkins()->deleteComputer($this->getName());
+
+    return $this;
+  }
+
+  /**
+   * @return Jenkins
+   */
+  public function getJenkins()
+  {
+    return $this->jenkins;
+  }
+
+  /**
+   * @param Jenkins $jenkins
+   *
+   * @return Jenkins_Computer
+   */
+  public function setJenkins(Jenkins $jenkins)
+  {
+    $this->jenkins = $jenkins;
+
+    return $this;
+  }
+
+}

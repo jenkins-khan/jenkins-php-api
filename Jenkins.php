@@ -300,7 +300,7 @@ class Jenkins
    * @return Jenkins_Build
    * @throws RuntimeException
    */
-  public function getBuild($job, $buildId, $tree = 'actions[parameters,parameters[name,value]],result,duration,timestamp,number,url,estimatedDuration')
+  public function getBuild($job, $buildId, $tree = 'actions[parameters,parameters[name,value]],result,duration,timestamp,number,url,estimatedDuration,builtOn')
   {
     if ($tree !== null)
     {
@@ -337,6 +337,34 @@ class Jenkins
         $this->getUrlJob($job)
       : sprintf('%s/job/%s/%d', $this->baseUrl, $job, $buildId)
     ;
+  }
+
+  /**
+   * @param string $computerName
+   *
+   * @return Jenkins_Computer
+   * @throws RuntimeException
+   */
+  public function getComputer($computerName)
+  {
+    $url = sprintf('%s/computer/%s/api/json', $this->baseUrl, $computerName);
+    $curl = curl_init($url);
+
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    $ret = curl_exec($curl);
+
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException(sprintf('Error during getting information for computer %s on %s', $computerName, $this->baseUrl));
+    }
+    $infos = json_decode($ret);
+
+    if (!$infos instanceof stdClass)
+    {
+      return null;
+    }
+
+    return new Jenkins_Computer($infos, $this);
   }
 
   /**
@@ -466,6 +494,40 @@ class Jenkins
     }
   }
 
+  /**
+   * @param string $computerName
+   *
+   * @throws RuntimeException
+   * @return void
+   */
+  public function toggleOfflineComputer($computerName)
+  {
+    $url  = sprintf('%s/computer/%s/toggleOffline', $this->baseUrl, $computerName);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_exec($curl);
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException(sprintf('Error marking %s offline', $computerName));
+    }
+  }
 
+  /**
+   * @param string $computerName
+   *
+   * @throws RuntimeException
+   * @return void
+   */
+  public function deleteComputer($computerName)
+  {
+    $url  = sprintf('%s/computer/%s/doDelete', $this->baseUrl, $computerName);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_exec($curl);
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException(sprintf('Error deleting %s', $computerName));
+    }
+  }
 
 }

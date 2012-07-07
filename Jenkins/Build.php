@@ -249,4 +249,10 @@ class Jenkins_Build
 
     return $this;
   }
+
+  public function getBuiltOn()
+  {
+    return $this->build->builtOn;
+  }
+
 }
