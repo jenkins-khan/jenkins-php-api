@@ -468,13 +468,14 @@ class Jenkins
 
 
   /**
-   * @param Jenkins_Build $build
+   * @param string $jobname
+   * @param string $buildNumber
    *
    * @return string
    */
-  public function getConsoleTextBuild(Jenkins_Build $build)
+  public function getConsoleTextBuild($jobname, $buildNumber)
   {
-    $url  = sprintf('%s/consoleText', $build->getUrl());
+    $url  = sprintf('%s/job/%s/%s/consoleText', $this->baseUrl, $jobname, $buildNumber);
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     return curl_exec($curl);
