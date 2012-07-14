@@ -1,0 +1,165 @@
+{
+  "duration": 0.3716328,
+  "failCount": 0,
+  "passCount": 9,
+  "skipCount": 0,
+  "suites": [
+    {
+      "cases": [
+        {
+          "age": 0,
+          "className": "tests\\units\\Rpm",
+          "duration": 0.06950712,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testEvrSplit",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        }
+      ],
+      "duration": 0.06950712,
+      "id": null,
+      "name": "tests_units.Rpm",
+      "stderr": null,
+      "stdout": null,
+      "timestamp": null
+    },
+    {
+      "cases": [
+        {
+          "age": 0,
+          "className": "tests\\units\\menuGroup",
+          "duration": 0.014924049,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testGetName",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        },
+        {
+          "age": 0,
+          "className": "tests\\units\\menuGroup",
+          "duration": 0.014972925,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testIterable",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        },
+        {
+          "age": 0,
+          "className": "tests\\units\\menuGroup",
+          "duration": 0.023216963,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testGroup",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        },
+        {
+          "age": 0,
+          "className": "tests\\units\\menuGroup",
+          "duration": 0.059604883,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testException",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        }
+      ],
+      "duration": 0.11271882,
+      "id": null,
+      "name": "tests_units.menuGroup",
+      "stderr": null,
+      "stdout": null,
+      "timestamp": null
+    },
+    {
+      "cases": [
+        {
+          "age": 0,
+          "className": "tests\\units\\menuItem",
+          "duration": 0.021090984,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testConstructParameters",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        },
+        {
+          "age": 0,
+          "className": "tests\\units\\menuItem",
+          "duration": 0.027074099,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testConstructExceptionForInternalUri",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        },
+        {
+          "age": 0,
+          "className": "tests\\units\\menuItem",
+          "duration": 0.027066946,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testConstructExceptionForName",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        }
+      ],
+      "duration": 0.07523203,
+      "id": null,
+      "name": "tests_units.menuItem",
+      "stderr": null,
+      "stdout": null,
+      "timestamp": null
+    },
+    {
+      "cases": [
+        {
+          "age": 0,
+          "className": "tests\\units\\urlFilterGenerator",
+          "duration": 0.11417484,
+          "errorDetails": null,
+          "errorStackTrace": null,
+          "failedSince": 0,
+          "name": "testRender",
+          "skipped": false,
+          "status": "PASSED",
+          "stderr": null,
+          "stdout": null
+        }
+      ],
+      "duration": 0.11417484,
+      "id": null,
+      "name": "tests_units.urlFilterGenerator",
+      "stderr": null,
+      "stdout": null,
+      "timestamp": null
+    }
+  ]
+}
