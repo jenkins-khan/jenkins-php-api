@@ -528,6 +528,7 @@ class Jenkins
     {
       throw new RuntimeException(sprintf('Error deleting %s', $computerName));
     }
+  }
 
   /**
    * @param string $jobname
