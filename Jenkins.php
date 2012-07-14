@@ -544,4 +544,35 @@ class Jenkins
     return curl_exec($curl);
   }
 
+  /**
+   * @param string $jobName
+   * @param string $buildNumber
+   *
+   * @return array
+   */
+  public function getTestReport($jobName, $buildId)
+  {
+    $url  = sprintf('%s/job/%s/%d/testReport/api/json', $this->baseUrl, $jobName, $buildId);
+    $curl = curl_init($url);
+
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    $ret = curl_exec($curl);
+
+    $errorMessage = sprintf('Error during getting information for build %s#%d on %s', $jobName, $buildId, $this->baseUrl);
+
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException($errorMessage);
+    }
+    $infos = json_decode($ret);
+
+    if (!$infos instanceof stdClass)
+    {
+      throw new RuntimeException($errorMessage);
+    }
+
+    return new Jenkins_TestReport($this, $infos, $jobName, $buildId);
+  }
+
+
 }
