@@ -42,6 +42,14 @@ class Jenkins_TestReport
   /**
    * @return string
    */
+  public function getOriginalTestReport()
+  {
+    return json_encode($this->testReport);
+  }
+
+  /**
+   * @return string
+   */
   public function getJobName()
   {
     return $this->jobName;

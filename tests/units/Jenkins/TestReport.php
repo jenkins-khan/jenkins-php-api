@@ -28,6 +28,26 @@ class Jenkins_TestReport extends atoum\test
     $this->assert->phpArray($report->getSuites())->hasSize(4);
   }
 
+  public function test_getOriginalTestReport()
+  {
+    $jenkins    = new \mock\Jenkins('url');
+
+    $reportJson = json_decode(file_get_contents(__DIR__ . '/report_passed.json'));
+    $report     = new \Jenkins_TestReport($jenkins, $reportJson, $jobName = 'units', $buildNumber = '32');
+
+    $this->assert->string($report = $report->getOriginalTestReport())
+      ->isNotEmpty()
+      ->hasLength(2528)
+      ->contains('"failCount":0')
+      ->contains('"passCount":9')
+    ;
+
+    $this->assert->array(json_decode($report, true))
+      ->isNotEmpty()
+      ->hasSize(5)
+    ;
+  }
+
   public function test_getSuite()
   {
     $jenkins    = new \mock\Jenkins('url');
