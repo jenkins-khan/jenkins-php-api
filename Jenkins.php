@@ -401,36 +401,24 @@ class Jenkins
    *
    * @return string
    *
+   * @deprecated use getJobConfig instead
+   *
    * @throws RuntimeException
    */
   public function retrieveXmlConfigAsString($jobname)
   {
-    $url  = sprintf('%s/job/%s/config.xml', $this->baseUrl, $jobname);
-    $curl = curl_init($url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    $ret = curl_exec($curl);
-    if (curl_errno($curl))
-    {
-      throw new RuntimeException(sprintf('Error during getting configuation for job %s', $jobname));
-    }
-    return $ret;
+    return $this->getJobConfig($jobname);
   }
 
   /**
    * @param string      $jobname
    * @param DomDocument $document
+   *
+   * @deprecated use setJobConfig instead
    */
   public function setConfigFromDomDocument($jobname, DomDocument $document)
   {
-    $url  = sprintf('%s/job/%s/config.xml', $this->baseUrl, $jobname);
-    $curl = curl_init($url);
-    curl_setopt($curl, CURLOPT_POST, 1);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $document->saveXML());
-    curl_exec($curl);
-    if (curl_errno($curl))
-    {
-      throw new RuntimeException(sprintf('Error during setting configuration for job %s', $jobname));
-    }
+    $this->setJobConfig($jobname, $document->saveXML());
   }
 
   /**
@@ -456,6 +444,41 @@ class Jenkins
     {
       throw new RuntimeException(sprintf('Error creating job %s', $jobname));
     }
+  }
+
+  /**
+   * @param string $jobname
+   * @param string $document
+   */
+  public function setJobConfig($jobname, $configuration)
+  {
+    $url  = sprintf('%s/job/%s/config.xml', $this->baseUrl, $jobname);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $configuration);
+    curl_exec($curl);
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException(sprintf('Error during setting configuration for job %s', $jobname));
+    }
+  }
+
+  /**
+   * @param string $jobname
+   *
+   * @return string
+   */
+  public function getJobConfig($jobname)
+  {
+    $url  = sprintf('%s/job/%s/config.xml', $this->baseUrl, $jobname);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    $ret = curl_exec($curl);
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException(sprintf('Error during getting configuation for job %s', $jobname));
+    }
+    return $ret;
   }
 
   /**
