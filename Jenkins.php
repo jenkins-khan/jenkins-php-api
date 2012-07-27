@@ -97,6 +97,23 @@ class Jenkins
   }
 
   /**
+   * @return Jenkins_Job[]
+   */
+  public function getJobs()
+  {
+    $this->initialize();
+
+    $jobs = array();
+    foreach ($this->jenkins->jobs as $job)
+    {
+      $jobs[$job->name] = $this->getJob($job->name);
+    }
+
+    return $jobs;
+    
+  }
+
+  /**
    * @param string $computer
    * @return array
    * @throws RuntimeException
