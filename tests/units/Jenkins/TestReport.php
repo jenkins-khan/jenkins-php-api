@@ -11,6 +11,7 @@ class Jenkins_TestReport extends atoum\test
   public function setUp()
   {
     $this->mockGenerator->generate('\Jenkins');
+    return true;
   }
 
   public function test__construct()
