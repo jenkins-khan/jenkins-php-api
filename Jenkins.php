@@ -110,7 +110,7 @@ class Jenkins
     }
 
     return $jobs;
-    
+
   }
 
   /**
@@ -614,5 +614,61 @@ class Jenkins
     return new Jenkins_TestReport($this, $infos, $jobName, $buildId);
   }
 
+  /**
+   * Returns the content of a page according to the jenkins base url.
+   * Usefull if you use jenkins plugins that provides specific APIs.
+   * (e.g. "/cloud/ec2-us-east-1/provision")
+   *
+   * @param string $uri
+   * @param array  $curlOptions
+   *
+   * @return string
+   */
+  public function execute($uri, array $curlOptions)
+  {
+    $url  = $this->baseUrl . '/' . $uri;
+    $curl = curl_init($url);
+    curl_setopt_array($curl, $curlOptions);
+    $ret = curl_exec($curl);
+
+    if (curl_errno($curl))
+    {
+      throw new RuntimeException(sprintf('Error calling "%s"', $url));
+    }
+    return $ret;
+  }
+
+  /**
+   * @return Jenkins_Computer[]
+   */
+  public function getComputers()
+  {
+    $return = $this->execute('/computer/api/json', array(
+      CURLOPT_RETURNTRANSFER => 1,
+    ));
+    $infos = json_decode($return);
+    if (!$infos instanceof stdClass)
+    {
+      throw new RunTimeException('Error during json_decode');
+    }
+    $computers = array();
+    foreach ($infos->computer as $computer)
+    {
+      $computers[] = $this->getComputer($computer->displayName);
+    }
+    return $computers;
+  }
+
+  /**
+   * @param string $computerName
+   *
+   * @return string
+   */
+  public function getComputerConfiguration($computerName)
+  {
+    return $this->execute(sprintf('/computer/%s/config.xml', $computerName), array(
+       CURLOPT_RETURNTRANSFER => 1,
+    ));
+  }
 
 }
