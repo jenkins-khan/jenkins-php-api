@@ -83,4 +83,12 @@ class Jenkins_Computer
     return $this;
   }
 
+  /**
+   * @return string
+   */
+  public function getConfiguration()
+  {
+    return $this->getJenkins()->getComputerConfiguration($this->getName());
+  }
+
 }
