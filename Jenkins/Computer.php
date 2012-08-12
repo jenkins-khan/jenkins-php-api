@@ -43,6 +43,18 @@ class Jenkins_Computer
 
   /**
    *
+   * returns null when computer is launching
+   * returns stdClass when computer has been put offline
+   *
+   * @return null|stdClass
+   */
+  public function getOfflineCause()
+  {
+    return $this->computer->offlineCause;
+  }
+
+  /**
+   *
    * @return Jenkins_Computer
    */
   public function toggleOffline()
@@ -81,6 +93,14 @@ class Jenkins_Computer
     $this->jenkins = $jenkins;
 
     return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getConfiguration()
+  {
+    return $this->getJenkins()->getComputerConfiguration($this->getName());
   }
 
 }
