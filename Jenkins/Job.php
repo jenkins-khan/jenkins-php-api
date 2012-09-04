@@ -78,7 +78,7 @@ class Jenkins_Job
           ? $parameterDefinition->defaultParameterValue->value
           : null;
         $description = property_exists($parameterDefinition, 'description')
-          ? utf8_decode($parameterDefinition->description)
+          ? $parameterDefinition->description
           : null;
         $choices     = property_exists($parameterDefinition, 'choices')
           ? $parameterDefinition->choices
