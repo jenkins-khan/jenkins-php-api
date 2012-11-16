@@ -289,7 +289,7 @@ class Jenkins
    */
   public function getView($viewName)
   {
-    $url = sprintf('%s/view/%s/api/json', $this->baseUrl, $viewName);
+    $url = sprintf('%s/view/%s/api/json', $this->baseUrl, rawurlencode($viewName));
     $curl = curl_init($url);
 
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
