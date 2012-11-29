@@ -94,6 +94,14 @@ class Jenkins_Job
     
     return $parameters;
   }
+  
+   /**
+   * @return string
+   */
+  public function getColor()
+  {
+    return $this->job->color;
+  }
 
   /**
    * @return string
