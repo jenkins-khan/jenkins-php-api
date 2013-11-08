@@ -2,7 +2,7 @@ Jenkins PHP API
 ===============
 
 
-Jenkins PHP API is a set of classes designed to interract with Jenkins CI using it's API.
+Jenkins PHP API is a set of classes designed to interact with Jenkins CI using it's API.
 
 Before anything, you need to instanciate the client :
 
@@ -13,7 +13,7 @@ Before anything, you need to instanciate the client :
     $jenkins = new Jenkins('http://host.org:8080');
 ```
 
-If your jenkins need authentication, you need to pass and URL like this : `'http://user:token@host.org:8080'`.
+If your Jenkins need authentication, you need to pass and URL like this : `'http://user:token@host.org:8080'`.
 
 
 Here is some examples of how to use it :
@@ -38,12 +38,11 @@ Launch a Job
 ```
 
 
-List the jobs of view
----------------------
+List the jobs of a given view
+-----------------------------
 
 ```php
     $view = $jenkins->getView('madb_deploy');
-    //string(4) "blue"
     foreach ($view->getJobs() as $job) {
       var_dump($job->getName());
     }
@@ -53,7 +52,7 @@ List the jobs of view
     //string(11) "fedora-pull"
 ```
 
-List Builds and their status
+List builds and their status
 ----------------------------
 
 ```php
@@ -69,7 +68,7 @@ List Builds and their status
 ```
 
 
-Check if jenkins is available
+Check if Jenkins is available
 -----------------------------
 
 ```php
