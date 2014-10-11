@@ -292,6 +292,12 @@ class Jenkins
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     $ret = curl_exec($curl);
 
+    $response_info = curl_getinfo( $curl );
+
+    if ( 200 != $response_info['http_code'] ) {
+      return false;
+    }
+
     if (curl_errno($curl))
     {
       throw new RuntimeException(sprintf('Error during getting information for job %s on %s', $jobName, $this->baseUrl));
