@@ -14,11 +14,105 @@ class Jenkins
   private $jenkins = null;
 
   /**
+   * Whether or not to retrieve and send anti-CSRF crumb tokens
+   * with each request
+   *
+   * Defaults to false for backwards compatibility
+   * 
+   * @var boolean
+   */
+  private $crumbsEnabled = false;
+
+  /**
+   * The anti-CSRF crumb to use for each request
+   *
+   * Set when crumbs are enabled, by requesting a new crumb from Jenkins
+   * 
+   * @var string
+   */
+  private $crumb;
+
+  /**
+   * The header to use for sending anti-CSRF crumbs
+   *
+   * Set when crumbs are enabled, by requesting a new crumb from Jenkins
+   * 
+   * @var string
+   */
+  private $crumbRequestField;
+
+  /**
    * @param string $baseUrl
    */
   public function __construct($baseUrl)
   {
     $this->baseUrl = $baseUrl;
+  }
+
+  /**
+   * Enable the use of anti-CSRF crumbs on requests
+   *
+   * @return void
+   */
+  public function enableCrumbs() {
+    $this->crumbsEnabled = true;
+
+    $crumbResult = $this->requestCrumb();
+
+    if ( ! $crumbResult || ! is_object( $crumbResult ) ) {
+      $this->crumbsEnabled = false;
+
+      return;
+    }
+
+    $this->crumb              = $crumbResult->crumb;
+    $this->crumbRequestField  = $crumbResult->crumbRequestField;
+  }
+
+  /**
+   * Disable the use of anti-CSRF crumbs on requests
+   * 
+   * @return void
+   */
+  public function disableCrumbs() {
+    $this->crumbsEnabled = false;
+  }
+
+  /**
+   * Get the status of anti-CSRF crumbs
+   * 
+   * @return boolean Whether or not crumbs have been enabled
+   */
+  public function areCrumbsEnabled() {
+    return $this->crumbsEnabled;
+  }
+
+  public function requestCrumb() {
+    $url = sprintf( '%s/crumbIssuer/api/json', $this->baseUrl );
+
+    $curl = curl_init( $url );
+
+    curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
+
+    $ret = curl_exec( $curl );
+
+    if ( curl_errno( $curl ) )
+    {
+      throw new RuntimeException( 'Error getting csrf crumb' );
+    }
+
+    $crumbResult = json_decode( $ret );
+
+    if ( ! $crumbResult instanceof stdClass )
+    {
+      throw new RuntimeException( 'Error during json_decode of csrf crumb' );
+    }
+
+    return $crumbResult;
+  }
+
+  public function getCrumbHeader() {
+    return "$this->crumbRequestField: $this->crumb";
   }
 
   /**
@@ -168,6 +262,14 @@ class Jenkins
     curl_setopt($curl, CURLOPT_POST, 1);
     curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($parameters));
 
+    $headers = array();
+
+    if ( $this->areCrumbsEnabled() ) {
+      $headers[] = $this->getCrumbHeader();
+    }
+
+    curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
+
     curl_exec($curl);
 
     if (curl_errno($curl))
@@ -215,6 +317,14 @@ class Jenkins
 
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_POST, 1);
+
+    $headers = array();
+
+    if ( $this->areCrumbsEnabled() ) {
+      $headers[] = $this->getCrumbHeader();
+    }
+
+    curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
 
     $ret = curl_exec($curl);
 
@@ -449,10 +559,20 @@ class Jenkins
     $url  = sprintf('%s/createItem?name=%s', $this->baseUrl, $jobname);
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_POST, 1);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
+
     curl_setopt($curl, CURLOPT_POSTFIELDS, $xmlConfiguration);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_exec($curl);
+
+    $headers = array( 'Content-Type: text/xml' );
+
+    if ( $this->areCrumbsEnabled() ) {
+      $headers[] = $this->getCrumbHeader();
+    }
+
+    curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
+
+    $response = curl_exec($curl);
+
     if (curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200)
     {
       throw new InvalidArgumentException(sprintf('Job %s already exists', $jobname));
@@ -473,6 +593,15 @@ class Jenkins
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_POST, 1);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $configuration);
+
+    $headers = array( 'Content-Type: text/xml' );
+
+    if ( $this->areCrumbsEnabled() ) {
+      $headers[] = $this->getCrumbHeader();
+    }
+
+    curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
+
     curl_exec($curl);
     if (curl_errno($curl))
     {
@@ -508,6 +637,15 @@ class Jenkins
 
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_POST, 1);
+
+    $headers = array();
+
+    if ( $this->areCrumbsEnabled() ) {
+      $headers[] = $this->getCrumbHeader();
+    }
+
+    curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
+
     curl_exec($curl);
     if (curl_errno($curl))
     {
@@ -527,6 +665,15 @@ class Jenkins
 
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_POST, 1);
+
+    $headers = array();
+
+    if ( $this->areCrumbsEnabled() ) {
+      $headers[] = $this->getCrumbHeader();
+    }
+
+    curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
+
     curl_exec($curl);
     if (curl_errno($curl))
     {
@@ -545,6 +692,15 @@ class Jenkins
     $url  = sprintf('%s/computer/%s/toggleOffline', $this->baseUrl, $computerName);
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_POST, 1);
+
+    $headers = array();
+
+    if ( $this->areCrumbsEnabled() ) {
+      $headers[] = $this->getCrumbHeader();
+    }
+
+    curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
+
     curl_exec($curl);
     if (curl_errno($curl))
     {
@@ -563,6 +719,15 @@ class Jenkins
     $url  = sprintf('%s/computer/%s/doDelete', $this->baseUrl, $computerName);
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_POST, 1);
+
+    $headers = array();
+    
+    if ( $this->areCrumbsEnabled() ) {
+      $headers[] = $this->getCrumbHeader();
+    }
+
+    curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
+
     curl_exec($curl);
     if (curl_errno($curl))
     {
