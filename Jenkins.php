@@ -40,7 +40,7 @@ class Jenkins
       {
         $this->getQueue();
       }
-      catch(RunTimeException $e)
+      catch(RuntimeException $e)
       {
         //en cours de lancement de jenkins, on devrait passer par là
         return false;
@@ -73,7 +73,7 @@ class Jenkins
     $this->jenkins = json_decode($ret);
     if (!$this->jenkins instanceof stdClass)
     {
-      throw new RunTimeException('Error during json_decode');
+      throw new RuntimeException('Error during json_decode');
     }
   }
 
@@ -138,7 +138,7 @@ class Jenkins
       $infos = json_decode($ret);
       if (!$infos instanceof stdClass)
       {
-        throw new RunTimeException('Error during json_decode');
+        throw new RuntimeException('Error during json_decode');
       }
 
       $executors[] = new Jenkins_Executor($infos, $computer, $this);
@@ -197,7 +197,7 @@ class Jenkins
     $infos = json_decode($ret);
     if (!$infos instanceof stdClass)
     {
-      throw new RunTimeException('Error during json_decode');
+      throw new RuntimeException('Error during json_decode');
     }
 
     return new Jenkins_Job($infos, $this);
@@ -243,7 +243,7 @@ class Jenkins
     $infos = json_decode($ret);
     if (!$infos instanceof stdClass)
     {
-      throw new RunTimeException('Error during json_decode');
+      throw new RuntimeException('Error during json_decode');
     }
 
     return new Jenkins_Queue($infos, $this);
@@ -302,7 +302,7 @@ class Jenkins
     $infos = json_decode($ret);
     if (!$infos instanceof stdClass)
     {
-      throw new RunTimeException('Error during json_decode');
+      throw new RuntimeException('Error during json_decode');
     }
 
     return new Jenkins_View($infos, $this);
@@ -649,7 +649,7 @@ class Jenkins
     $infos = json_decode($return);
     if (!$infos instanceof stdClass)
     {
-      throw new RunTimeException('Error during json_decode');
+      throw new RuntimeException('Error during json_decode');
     }
     $computers = array();
     foreach ($infos->computer as $computer)
