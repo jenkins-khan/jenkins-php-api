@@ -156,7 +156,7 @@ class Jenkins_Build
       $remaining = $estimatedDuration - (time() - $this->getTimestamp()) ;
     }
     
-    return $remaining;
+    return max( 0, $remaining );
   }
   
   /**
