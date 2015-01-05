@@ -1,23 +1,24 @@
 Jenkins PHP API
 ===============
 
+This version of the Jenkins PHP API is based on https://github.com/jenkins-khan/jenkins-php-api.
 
-Jenkins PHP API is a set of classes designed to interact with Jenkins CI using its API.
+It wraps the API calls of the Jenkins API.
 
-Before anything, you need to instantiate the client :
 
+Getting started
+---------------
+First you need to instantiate the connection:
 
 ```php
-    require_once('Autoload.php');
-    Jenkins_Autoloader::register();
     $jenkins = new Jenkins('http://host.org:8080');
 ```
 
 If your Jenkins needs authentication, you need to pass a URL like this : `'http://user:token@host.org:8080'`.
 
 
-Here are some examples of how to use it:
 
+Here are some examples of how to use it:
 
 Get the color of the job
 ------------------------

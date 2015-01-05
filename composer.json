@@ -10,5 +10,8 @@
     ],
     "require": {
         "ext-curl": "*"
+    },
+    "autoload": {
+        "classmap": ["src"]
     }
 }
