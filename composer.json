@@ -2,6 +2,7 @@
     "name": "chbiel/jenkins-php-api",
     "description": "Library to control Jenkins via PHP through JSON api",
     "minimum-stability": "dev",
+    "homepage": "https://github.com/chbiel/jenkins-php-api",
     "license": "proprietary",
     "authors": [
         {
@@ -9,9 +10,12 @@
         }
     ],
     "require": {
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "php": ">=5.4.0"
     },
     "autoload": {
-        "classmap": ["src"]
+        "psr-0": {
+            "JenkinsApi": "src/"
+        }
     }
 }
