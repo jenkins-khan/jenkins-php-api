@@ -1,0 +1,14 @@
+{
+    "name": "chbiel/jenkins-php-api",
+    "description": "Library to control Jenkins via PHP through JSON api",
+    "minimum-stability": "dev",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Christopher Biel", "email": "christopher.biel89@gmail.com"
+        }
+    ],
+    "require": {
+        "ext-curl": "*"
+    }
+}
