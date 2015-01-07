@@ -4,7 +4,6 @@ namespace JenkinsApi\Jenkins;
 use JenkinsApi\Jenkins;
 use stdClass;
 
-
 /**
  * Represents an executor
  *

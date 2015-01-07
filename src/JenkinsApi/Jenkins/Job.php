@@ -1,10 +1,9 @@
 <?php
 namespace JenkinsApi\Jenkins;
 
-use DOMDocument;
+use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
 use RuntimeException;
-use stdClass;
 
 /**
  *
@@ -13,26 +12,33 @@ use stdClass;
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
  */
-class Job
+class Job extends AbstractItem
 {
     /**
-     * @var stdClass
+     * @var
      */
-    private $_job;
+    private $_jobName;
 
     /**
-     * @var Jenkins
+     * @param         $jobName
+     * @param Jenkins $jenkins
+     *
+     * @internal param stdClass $jobData
      */
-    protected $_jenkins;
-
-    /**
-     * @param stdClass $job
-     * @param Jenkins  $jenkins
-     */
-    public function __construct($job, Jenkins $jenkins)
+    public function __construct($jobName, Jenkins $jenkins)
     {
-        $this->_job = $job;
+        $this->jobName = $jobName;
         $this->_jenkins = $jenkins;
+
+        $this->refresh();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUrl()
+    {
+        return sprintf('%s/job/%s/api/json', $this->_jenkins->getBaseUrl(), $this->_jobName);
     }
 
     /**
@@ -41,8 +47,8 @@ class Job
     public function getBuilds()
     {
         $builds = array();
-        foreach ($this->_job->builds as $build) {
-            $builds[] = $this->getJenkinsBuild($build->number);
+        foreach ($this->_data->builds as $build) {
+            $builds[] = $this->getBuild($build->number);
         }
 
         return $builds;
@@ -54,17 +60,9 @@ class Job
      * @return Build
      * @throws RuntimeException
      */
-    public function getJenkinsBuild($buildId)
+    public function getBuild($buildId)
     {
-        return $this->getJenkins()->getBuild($this->getName(), $buildId);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->_job->name;
+        return $this->_jenkins->getBuild($this->getName(), $buildId);
     }
 
     /**
@@ -74,7 +72,7 @@ class Job
     {
         $parameters = array();
 
-        foreach ($this->_job->actions as $action) {
+        foreach ($this->_data->actions as $action) {
             if (!property_exists($action, 'parameterDefinitions')) {
                 continue;
             }
@@ -106,35 +104,15 @@ class Job
      */
     public function getColor()
     {
-        return $this->_job->color;
+        return $this->_data->color;
     }
 
     /**
      * @return string
-     *
-     * @throws RuntimeException
      */
-    public function retrieveXmlConfigAsString()
+    public function getName()
     {
-        return $this->_jenkins->retrieveXmlConfigAsString($this->getName());
-    }
-
-    /**
-     * @return DOMDocument
-     */
-    public function retrieveXmlConfigAsDomDocument()
-    {
-        $document = new DOMDocument;
-        $document->loadXML($this->retrieveXmlConfigAsString());
-        return $document;
-    }
-
-    /**
-     * @return Jenkins
-     */
-    public function getJenkins()
-    {
-        return $this->_jenkins;
+        return $this->_data->name;
     }
 
     /**
@@ -142,10 +120,37 @@ class Job
      */
     public function getLastSuccessfulBuild()
     {
-        if (null === $this->_job->lastSuccessfulBuild) {
+        if (null === $this->_data->lastSuccessfulBuild) {
             return null;
         }
 
-        return $this->getJenkins()->getBuild($this->getName(), $this->_job->lastSuccessfulBuild->number);
+        return $this->_jenkins->getBuild($this->getName(), $this->_data->lastSuccessfulBuild->number);
+    }
+
+    /**
+     * @return Build|null
+     */
+    public function getLastBuild()
+    {
+        if (null === $this->_data->lastBuild) {
+            return null;
+        }
+        return $this->_jenkins->getBuild($this->getName(), $this->_data->lastBuild->number);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBuildable()
+    {
+        return $this->_data->buildable;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCurrentlyBuilding()
+    {
+        return $this->getLastBuild()->isBuilding();
     }
 }
