@@ -38,7 +38,7 @@ class Job extends AbstractItem
      */
     protected function getUrl()
     {
-        return sprintf('%s/job/%s/api/json', $this->_jenkins->getBaseUrl(), $this->_jobName);
+        return sprintf('job/%s/api/json', $this->_jobName);
     }
 
     /**
@@ -152,5 +152,21 @@ class Job extends AbstractItem
     public function isCurrentlyBuilding()
     {
         return $this->getLastBuild()->isBuilding();
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return bool
+     */
+    public function launch($parameters = array())
+    {
+        if (empty($parameters)) {
+            $this->_jenkins->post(sprintf('job/%s/build', $this->_jobName));
+        } else {
+            $this->_jenkins->post(sprintf('job/%s/buildWithParameters', $this->_jobName), $parameters);
+        }
+
+        return true;
     }
 }

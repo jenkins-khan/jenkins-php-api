@@ -80,7 +80,7 @@ class Jenkins
      */
     public function getJobs()
     {
-        $data = $this->get($this->_baseUrl . '/api/json');
+        $data = $this->get('api/json');
 
         $jobs = array();
         foreach ($data->jobs as $job) {
@@ -96,7 +96,7 @@ class Jenkins
      */
     public function getQueue()
     {
-        $data = $this->get(sprintf('%s/queue/api/json', $this->_baseUrl));
+        $data = $this->get('queue/api/json');
 
         return new Queue($data, $this);
     }
@@ -109,7 +109,7 @@ class Jenkins
      */
     public function get($url, $depth = 1)
     {
-        $url = sprintf($url . '?depth=' . $depth, $this->_baseUrl);
+        $url = sprintf('%s' . $url . '?depth=' . $depth, $this->_baseUrl);
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -130,6 +130,36 @@ class Jenkins
         }
 
         return $data;
+    }
+
+    /**
+     * @param string $url
+     * @param array  $parameters
+     *
+     * @return bool
+     */
+    public function post($url, $parameters = [])
+    {
+        $curl = curl_init($url);
+
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($parameters));
+
+        $headers = array();
+
+        if ($this->areCrumbsEnabled()) {
+            $headers[] = $this->getCrumbHeader();
+        }
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+        curl_exec($curl);
+
+        if (curl_errno($curl)) {
+            throw new RuntimeException(sprintf('Error trying to launch job "%s" (%s)', $parameters['name'], $url));
+        }
+
+        return true;
     }
 
     /**
