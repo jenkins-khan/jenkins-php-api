@@ -22,8 +22,6 @@ class Job extends AbstractItem
     /**
      * @param         $jobName
      * @param Jenkins $jenkins
-     *
-     * @internal param stdClass $jobData
      */
     public function __construct($jobName, Jenkins $jenkins)
     {
