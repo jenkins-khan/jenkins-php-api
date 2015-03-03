@@ -1,5 +1,5 @@
 <?php
-namespace JenkinsApi\Jenkins;
+namespace JenkinsApi\Item;
 
 use JenkinsApi\Jenkins;
 use stdClass;
@@ -7,7 +7,7 @@ use stdClass;
 /**
  * Control the Jenkins queue
  *
- * @package    JenkinsApi\Jenkins
+ * @package    JenkinsApi\Item
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
  */

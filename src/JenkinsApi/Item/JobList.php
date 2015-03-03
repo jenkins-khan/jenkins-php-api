@@ -9,7 +9,7 @@
  * @version    $Id$
  */
 
-namespace JenkinsApi\Jenkins;
+namespace JenkinsApi\Item;
 
 
 class JobList {

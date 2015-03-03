@@ -1,5 +1,5 @@
 <?php
-namespace JenkinsApi\Jenkins;
+namespace JenkinsApi\Item;
 
 use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
@@ -8,7 +8,7 @@ use RuntimeException;
 /**
  *
  *
- * @package    JenkinsApi\Jenkins
+ * @package    JenkinsApi\Item
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
  */
