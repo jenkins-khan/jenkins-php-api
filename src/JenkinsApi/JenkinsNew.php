@@ -12,8 +12,8 @@
 namespace JenkinsApi;
 
 
-use JenkinsApi\Jenkins\Job;
-use JenkinsApi\Jenkins\Queue;
+use JenkinsApi\Item\Job;
+use JenkinsApi\Item\Queue;
 use RuntimeException;
 use stdClass;
 
@@ -104,12 +104,18 @@ class Jenkins
     /**
      * @param string $url
      * @param int    $depth
+     * @param array  $params
      *
      * @return stdClass
      */
-    public function get($url, $depth = 1)
+    public function get($url, $depth = 1, $params = array())
     {
         $url = sprintf('%s' . $url . '?depth=' . $depth, $this->_baseUrl);
+        if ($params) {
+            foreach ($params as $key => $val) {
+                $url .= '&' . $key . '=' . $val;
+            }
+        }
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -244,6 +250,22 @@ class Jenkins
     }
 
     /**
+     * Get a list of all available jobs
+     *
+     * @throws RuntimeException
+     * @return array
+     */
+    public function getAllJobs()
+    {
+        $jobs = array();
+        $result = $this->get('api/json', 0);
+        foreach ($result as $job) {
+            $jobs[$job->name] = new Job($job->name, $this);
+        }
+        return $jobs;
+    }
+
+    /**
      * Get the currently building jobs
      *
      * @return array
@@ -263,7 +285,6 @@ class Jenkins
             throw new RuntimeException($errorMessage);
         }
         $xml = simplexml_load_string($ret);
-        var_dump($xml);
         $builds = $xml->xpath('/jobs');
         $buildingJobs = [];
         foreach ($builds as $build) {

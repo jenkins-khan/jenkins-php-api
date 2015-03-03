@@ -47,7 +47,7 @@ abstract class AbstractItem
      */
     public function get($propertyName)
     {
-        if ($this->_data instanceof stdClass && isset($this->_data->$propertyName)) {
+        if ($this->_data instanceof stdClass && property_exists($this->_data, $propertyName)) {
             return $this->_data->$propertyName;
         }
 

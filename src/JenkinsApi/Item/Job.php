@@ -15,6 +15,13 @@ use RuntimeException;
 class Job extends AbstractItem
 {
     /**
+     * @var int
+     */
+    protected $_timeoutSeconds = 86400;
+
+    protected $_checkIntervalSeconds = 5;
+
+    /**
      * @var
      */
     private $_jobName;
@@ -98,22 +105,6 @@ class Job extends AbstractItem
     }
 
     /**
-     * @return string
-     */
-    public function getColor()
-    {
-        return $this->_data->color;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->_data->name;
-    }
-
-    /**
      * @return Build|null
      */
     public function getLastSuccessfulBuild()
@@ -134,14 +125,6 @@ class Job extends AbstractItem
             return null;
         }
         return $this->_jenkins->getBuild($this->getName(), $this->_data->lastBuild->number);
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isBuildable()
-    {
-        return $this->_data->buildable;
     }
 
     /**
@@ -166,5 +149,57 @@ class Job extends AbstractItem
         }
 
         return true;
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return Build|bool
+     */
+    public function launchAndWait($parameters = array())
+    {
+        if(!$this->isCurrentlyBuilding()) {
+            $lastNumber = $this->getLastBuild()->getNumber();
+            $startTime = time();
+            $this->launch($parameters);
+
+            $build = $this->getLastBuild();
+
+            while(
+                (time() < $startTime + $this->_timeoutSeconds) &&
+                ($build->getNumber() == $lastNumber + 1 && !$build->isBuilding())
+            ) {
+                sleep($this->_checkIntervalSeconds);
+                $build->refresh();
+            }
+
+            return $build;
+
+        }
+        return false;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBuildable()
+    {
+        return $this->_data->buildable;
+    }
+
+    /**
+     * @return string
+     */
+    public function getColor()
+    {
+        return $this->get('color');
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->get('name');
     }
 }

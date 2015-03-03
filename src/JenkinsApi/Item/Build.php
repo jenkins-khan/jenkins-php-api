@@ -1,6 +1,7 @@
 <?php
 namespace JenkinsApi\Item;
 
+use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
 use stdClass;
 
@@ -11,7 +12,7 @@ use stdClass;
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
  */
-class Build
+class Build extends AbstractItem
 {
     /**
      * @var string
@@ -44,23 +45,41 @@ class Build
     const ABORTED = 'ABORTED';
 
     /**
-     * @var stdClass
-     */
-    private $_build;
-
-    /**
      * @var Jenkins
      */
     protected $_jenkins;
+    /**
+     * @var string
+     */
+    protected $_buildNumber;
 
     /**
-     * @param stdClass $build
-     * @param Jenkins  $jenkins
+     * @var string
      */
-    public function __construct($build, Jenkins $jenkins)
+    protected $_jobName;
+
+    /**
+     * @param string  $buildNumber
+     * @param string  $jobName
+     * @param Jenkins $jenkins
+     *
+     * @internal param stdClass $build
+     */
+    public function __construct($buildNumber, $jobName, Jenkins $jenkins)
     {
-        $this->_build = $build;
+        $this->_buildNumber = $buildNumber;
+        $this->_jobName = $jobName;
         $this->_jenkins = $jenkins;
+
+        $this->refresh();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUrl()
+    {
+        return sprintf('job/%s/%d/api/json', $this->_jobName, $this->_buildNumber);
     }
 
     /**
@@ -69,42 +88,14 @@ class Build
     public function getInputParameters()
     {
         $parameters = array();
-
-        if (!property_exists($this->_build->actions[0], 'parameters')) {
-            return $parameters;
+        if (($this->get('action')) === null && isset($this->get('action')[0])) {
+            return array();
         }
 
-        foreach ($this->_build->actions[0]->parameters as $parameter) {
+        foreach ($this->get('action')[0]->parameters as $parameter) {
             $parameters[$parameter->name] = $parameter->value;
         }
-
         return $parameters;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTimestamp()
-    {
-        //division par 1000 => pas de millisecondes
-        return $this->_build->timestamp / 1000;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDuration()
-    {
-        //division par 1000 => pas de millisecondes
-        return $this->_build->duration / 1000;
-    }
-
-    /**
-     * @return int
-     */
-    public function getNumber()
-    {
-        return $this->_build->number;
     }
 
     /**
@@ -129,8 +120,8 @@ class Build
         //we can use it witch is more accurate than calcule ourselves
         //but older versions need to continue to work, so in case of estimated
         //duration is not found we fallback to calcule it.
-        if (property_exists($this->_build, 'estimatedDuration')) {
-            return $this->_build->estimatedDuration / 1000;
+        if ($this->get('estimatedDuration')) {
+            return $this->get('estimatedDuration') / 1000;
         }
 
         $duration = null;
@@ -138,7 +129,6 @@ class Build
         if (null !== $progress && $progress >= 0) {
             $duration = ceil((time() - $this->getTimestamp()) / ($progress / 100));
         }
-
         return $duration;
     }
 
@@ -168,7 +158,7 @@ class Build
     public function getResult()
     {
         $result = null;
-        switch ($this->_build->result) {
+        switch ($this->get('result')) {
             case 'FAILURE':
                 $result = Build::FAILURE;
                 break;
@@ -193,40 +183,22 @@ class Build
     }
 
     /**
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->_build->url;
-    }
-
-    /**
      * @return Executor|null
      */
     public function getExecutor()
     {
-        if (!$this->isRunning()) {
+        if (!$this->isBuilding()) {
             return null;
         }
 
         $runExecutor = null;
         foreach ($this->getJenkins()->getExecutors() as $executor) {
             /** @var Executor $executor */
-
-            if ($this->getUrl() === $executor->getBuildUrl()) {
+            if ($this->getBuildUrl() === $executor->getBuildUrl()) {
                 $runExecutor = $executor;
             }
         }
-
         return $runExecutor;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRunning()
-    {
-        return Build::RUNNING === $this->getResult();
     }
 
     /**
@@ -242,7 +214,7 @@ class Build
      */
     public function getBuiltOn()
     {
-        return $this->_build->builtOn;
+        return $this->get('builtOn');
     }
 
     /**
@@ -250,6 +222,38 @@ class Build
      */
     public function isBuilding()
     {
-        return $this->_build->building;
+        return (bool)$this->get('building');
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestamp()
+    {
+        return $this->get('timestamp') / 1000;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration()
+    {
+        return $this->get('duration') / 1000;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNumber()
+    {
+        return $this->get('number');
+    }
+
+    /**
+     * @return string
+     */
+    public function getBuildUrl()
+    {
+        return $this->get('url');
     }
 }
