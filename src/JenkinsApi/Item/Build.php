@@ -45,10 +45,6 @@ class Build extends AbstractItem
     const ABORTED = 'ABORTED';
 
     /**
-     * @var Jenkins
-     */
-    protected $_jenkins;
-    /**
      * @var string
      */
     protected $_buildNumber;
@@ -199,14 +195,6 @@ class Build extends AbstractItem
             }
         }
         return $runExecutor;
-    }
-
-    /**
-     * @return Jenkins
-     */
-    public function getJenkins()
-    {
-        return $this->_jenkins;
     }
 
     /**
