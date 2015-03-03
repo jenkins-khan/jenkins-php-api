@@ -1,8 +1,8 @@
 <?php
 namespace JenkinsApi\Item;
 
+use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
-use stdClass;
 
 /**
  * Represents an executor
@@ -11,40 +11,52 @@ use stdClass;
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
  */
-class Executor
+class Executor extends AbstractItem
 {
     /**
-     * @var stdClass
+     * @var int
      */
-    private $_executor;
-
-    /**
-     * @var Jenkins
-     */
-    protected $_jenkins;
-
+    private $_executorId;
     /**
      * @var string
      */
-    protected $_node;
+    private $_nodeName;
 
     /**
-     * @param stdClass $executor
-     * @param string   $computer
-     * @param Jenkins  $jenkins
+     * @var Node
      */
-    public function __construct($executor, $computer, Jenkins $jenkins)
+    private $_node;
+
+    /**
+     * @param int     $executorId
+     * @param string  $nodeName
+     * @param Jenkins $jenkins
+     */
+    public function __construct($executorId, $nodeName, Jenkins $jenkins)
     {
-        $this->_executor = $executor;
-        $this->_node = $computer;
+        $this->_executorId = $executorId;
+        $this->_nodeName = $nodeName;
         $this->_jenkins = $jenkins;
+
+        $this->refresh();
     }
 
     /**
      * @return string
      */
+    protected function getUrl()
+    {
+        return sprintf('computer/%s/executors/%s/api/json', $this->_nodeName, $this->_executorId);
+    }
+
+    /**
+     * @return Node
+     */
     public function getNode()
     {
+        if(!$this->_node) {
+            $this->_node = new Node($this->_nodeName, $this->getJenkins());
+        }
         return $this->_node;
     }
 
@@ -53,7 +65,7 @@ class Executor
      */
     public function getProgress()
     {
-        return $this->_executor->progress;
+        return $this->get('progress');
     }
 
     /**
@@ -61,7 +73,7 @@ class Executor
      */
     public function getNumber()
     {
-        return $this->_executor->number;
+        return $this->get('number');
     }
 
 
@@ -70,12 +82,10 @@ class Executor
      */
     public function getBuildNumber()
     {
-        $number = null;
-        if (isset($this->_executor->currentExecutable)) {
-            $number = $this->_executor->currentExecutable->number;
+        if (($currentExecutable = $this->get('currentExecutable')) !== null) {
+            return $currentExecutable->number;
         }
-
-        return $number;
+        return null;
     }
 
     /**
@@ -83,12 +93,10 @@ class Executor
      */
     public function getBuildUrl()
     {
-        $url = null;
-        if (isset($this->_executor->currentExecutable)) {
-            $url = $this->_executor->currentExecutable->url;
+        if (($currentExecutable = $this->get('currentExecutable')) !== null) {
+            return $currentExecutable->url;
         }
-
-        return $url;
+        return null;
     }
 
     /**
@@ -96,7 +104,9 @@ class Executor
      */
     public function stop()
     {
-        $this->getJenkins()->stopExecutor($this);
+        $this->getJenkins()->post(
+            sprintf('computer/%s/executors/%s/stop', $this->getNode()->getName(), $this->getNumber())
+        );
     }
 
     /**

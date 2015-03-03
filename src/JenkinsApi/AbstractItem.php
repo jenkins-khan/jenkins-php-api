@@ -43,14 +43,13 @@ abstract class AbstractItem
     /**
      * @param string $propertyName
      *
-     * @return string|int|null
+     * @return string|int|null|stdClass
      */
     public function get($propertyName)
     {
         if ($this->_data instanceof stdClass && property_exists($this->_data, $propertyName)) {
             return $this->_data->$propertyName;
         }
-
         return null;
     }
 

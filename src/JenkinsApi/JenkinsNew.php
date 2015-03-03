@@ -111,10 +111,12 @@ class Jenkins
      * @param string $url
      * @param int    $depth
      * @param array  $params
+     * @param array  $curlOpts
      *
+     * @throws RuntimeException
      * @return stdClass
      */
-    public function get($url, $depth = 1, $params = array())
+    public function get($url, $depth = 1, $params = array(), array $curlOpts = [])
     {
         $url = sprintf('%s' . $url . '?depth=' . $depth, $this->_baseUrl);
         if ($params) {
@@ -123,6 +125,9 @@ class Jenkins
             }
         }
         $curl = curl_init($url);
+        if($curlOpts) {
+            curl_setopt_array($curl, $curlOpts);
+        }
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
@@ -147,13 +152,17 @@ class Jenkins
     /**
      * @param string $url
      * @param array  $parameters
+     * @param array  $curlOpts
      *
+     * @throws RuntimeException
      * @return bool
      */
-    public function post($url, $parameters = [])
+    public function post($url, array $parameters = [], array $curlOpts = [])
     {
         $curl = curl_init($url);
-
+        if($curlOpts) {
+            curl_setopt_array($curl, $curlOpts);
+        }
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($parameters));
 
@@ -164,7 +173,6 @@ class Jenkins
         }
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-
         curl_exec($curl);
 
         if (curl_errno($curl)) {
