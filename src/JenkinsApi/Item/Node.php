@@ -1,9 +1,9 @@
 <?php
 namespace JenkinsApi\Item;
 
+use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
 use stdClass;
-
 
 /**
  * Represents a node
@@ -12,26 +12,71 @@ use stdClass;
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
  */
-class Node
+class Node extends AbstractItem
 {
     /**
-     * @var stdClass
+     * @var string
      */
-    private $_node;
+    private $_nodeName;
 
     /**
-     * @var Jenkins
+     * @param string  $nodeName
+     * @param Jenkins $jenkins
      */
-    private $_jenkins;
-
-    /**
-     * @param stdClass $computer
-     * @param Jenkins  $jenkins
-     */
-    public function __construct($computer, Jenkins $jenkins)
+    public function __construct($nodeName, Jenkins $jenkins)
     {
-        $this->_node = $computer;
+        $this->_nodeName = $nodeName;
         $this->_jenkins = $jenkins;
+
+        $this->refresh();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUrl()
+    {
+        return sprintf('computer/%s/api/json', $this->_nodeName);
+    }
+
+    /**
+     * @return Executor[]
+     */
+    public function getExecutors()
+    {
+        $executors = [];
+        for ($i = 0; $i < $this->get('numExecutors'); $i++) {
+            $executors[] = new Executor($i, $this->_nodeName, $this->getJenkins());
+        }
+        return $executors;
+    }
+
+    /**
+     *
+     * @return Node
+     */
+    public function toggleOffline()
+    {
+        $this->getJenkins()->post(sprintf('computer/%s/toggleOffline', $this->_nodeName));
+        return $this;
+    }
+
+    /**
+     * @return void
+     */
+    public function delete()
+    {
+        $this->getJenkins()->post(sprintf('computer/%s/doDelete', $this->_nodeName));
+    }
+
+    /**
+     * @return string
+     */
+    public function getConfiguration()
+    {
+        return $this->getJenkins()->get(
+            sprintf('/computer/%s/config.xml', $this->_nodeName), [], [CURLOPT_RETURNTRANSFER => 1]
+        );
     }
 
     /**
@@ -39,7 +84,7 @@ class Node
      */
     public function getName()
     {
-        return $this->_node->displayName;
+        return $this->get('displayName');
     }
 
     /**
@@ -48,7 +93,7 @@ class Node
      */
     public function isOffline()
     {
-        return (bool)$this->_node->offline;
+        return (bool)$this->get('offline');
     }
 
     /**
@@ -60,44 +105,6 @@ class Node
      */
     public function getOfflineCause()
     {
-        return $this->_node->offlineCause;
-    }
-
-    /**
-     *
-     * @return Node
-     */
-    public function toggleOffline()
-    {
-        $this->getJenkins()->toggleOfflineNode($this->getName());
-
-        return $this;
-    }
-
-    /**
-     *
-     * @return Node
-     */
-    public function delete()
-    {
-        $this->getJenkins()->deleteNode($this->getName());
-
-        return $this;
-    }
-
-    /**
-     * @return Jenkins
-     */
-    public function getJenkins()
-    {
-        return $this->_jenkins;
-    }
-
-    /**
-     * @return string
-     */
-    public function getConfiguration()
-    {
-        return $this->getJenkins()->getNodeConfiguration($this->getName());
+        return $this->get('offlineCause');
     }
 }
