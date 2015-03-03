@@ -3,7 +3,6 @@ namespace JenkinsApi\Item;
 
 use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
-use stdClass;
 
 /**
  * Represents a single build
