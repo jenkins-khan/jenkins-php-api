@@ -11,12 +11,18 @@
 
 namespace JenkinsApi;
 
-
 use JenkinsApi\Item\Job;
 use JenkinsApi\Item\Queue;
 use RuntimeException;
 use stdClass;
 
+/**
+ * Wrapper for general
+ *
+ * @package    JenkinsApi
+ * @author     Christopher Biel <christopher.biel@jungheinrich.de>
+ * @version    $Id$
+ */
 class Jenkins
 {
     /**
