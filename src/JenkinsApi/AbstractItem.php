@@ -13,6 +13,13 @@ namespace JenkinsApi;
 
 use stdClass;
 
+/**
+ * Abstract class for all items that can be access via jenkins api
+ *
+ * @package    JenkinsApi
+ * @author     Christopher Biel <christopher.biel@jungheinrich.de>
+ * @version    $Id$
+ */
 abstract class AbstractItem
 {
     /**
@@ -31,7 +38,6 @@ abstract class AbstractItem
     public function refresh()
     {
         $this->_data = $this->$this->_jenkins->get($this->getUrl());
-
         return $this;
     }
 
