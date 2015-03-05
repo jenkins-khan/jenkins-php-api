@@ -74,4 +74,14 @@ abstract class AbstractItem
     {
         $this->_jenkins = $jenkins;
     }
+
+    public function __get($property)
+    {
+        return $this->get($property);
+    }
+
+    public function __isset($property)
+    {
+        return array_key_exists($property, $this->_data);
+    }
 }
