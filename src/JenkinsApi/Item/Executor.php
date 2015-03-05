@@ -3,6 +3,7 @@ namespace JenkinsApi\Item;
 
 use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
+use RuntimeException;
 
 /**
  * Represents an executor
@@ -104,9 +105,12 @@ class Executor extends AbstractItem
      */
     public function stop()
     {
-        $this->getJenkins()->post(
+        $response = $this->getJenkins()->post(
             sprintf('computer/%s/executors/%s/stop', $this->getNode()->getName(), $this->getNumber())
         );
+        if($response) {
+            throw new RuntimeException(sprintf('Error durring stopping executor #%s', $this->getNumber()));
+        }
     }
 
     /**

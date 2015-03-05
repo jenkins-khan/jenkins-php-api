@@ -57,8 +57,6 @@ class Build extends AbstractItem
      * @param string  $buildNumber
      * @param string  $jobName
      * @param Jenkins $jenkins
-     *
-     * @internal param stdClass $build
      */
     public function __construct($buildNumber, $jobName, Jenkins $jenkins)
     {
@@ -194,6 +192,14 @@ class Build extends AbstractItem
             }
         }
         return $runExecutor;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConsoleTextBuild()
+    {
+        return $this->getJenkins()->get(sprintf('job/%s/%s/consoleText', $this->_jobName, $this->_buildNumber));
     }
 
     /**

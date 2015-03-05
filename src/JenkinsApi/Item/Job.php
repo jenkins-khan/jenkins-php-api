@@ -1,6 +1,7 @@
 <?php
 namespace JenkinsApi\Item;
 
+use DOMDocument;
 use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
 use RuntimeException;
@@ -83,21 +84,11 @@ class Job extends AbstractItem
             }
 
             foreach ($action->parameterDefinitions as $parameterDefinition) {
-                $default = property_exists($parameterDefinition, 'defaultParameterValue')
-                    ? $parameterDefinition->defaultParameterValue->value
-                    : null;
-                $description = property_exists($parameterDefinition, 'description')
-                    ? $parameterDefinition->description
-                    : null;
-                $choices = property_exists($parameterDefinition, 'choices')
-                    ? $parameterDefinition->choices
-                    : null;
+                $default = property_exists($parameterDefinition, 'defaultParameterValue') ? $parameterDefinition->defaultParameterValue->value : null;
+                $description = property_exists($parameterDefinition, 'description') ? $parameterDefinition->description : null;
+                $choices = property_exists($parameterDefinition, 'choices') ? $parameterDefinition->choices : null;
 
-                $parameters[$parameterDefinition->name] = array(
-                    'default'     => $default,
-                    'choices'     => $choices,
-                    'description' => $description,
-                );
+                $parameters[$parameterDefinition->name] = array('default' => $default, 'choices' => $choices, 'description' => $description,);
             }
         }
 
@@ -158,17 +149,14 @@ class Job extends AbstractItem
      */
     public function launchAndWait($parameters = array())
     {
-        if(!$this->isCurrentlyBuilding()) {
+        if (!$this->isCurrentlyBuilding()) {
             $lastNumber = $this->getLastBuild()->getNumber();
             $startTime = time();
             $this->launch($parameters);
 
             $build = $this->getLastBuild();
 
-            while(
-                (time() < $startTime + $this->_timeoutSeconds) &&
-                ($build->getNumber() == $lastNumber + 1 && !$build->isBuilding())
-            ) {
+            while ((time() < $startTime + $this->_timeoutSeconds) && ($build->getNumber() == $lastNumber + 1 && !$build->isBuilding())) {
                 sleep($this->_checkIntervalSeconds);
                 $build->refresh();
             }
@@ -177,6 +165,45 @@ class Job extends AbstractItem
 
         }
         return false;
+    }
+
+    public function delete()
+    {
+        if (!$this->getJenkins()->post(sprintf('job/%s/doDelete', $this->_jobName))) {
+            throw new RuntimeException(sprintf('Error deleting job %s on %s', $this->_jobName, $this->getJenkins()->getBaseUrl()));
+        }
+    }
+
+    public function getConfig()
+    {
+        $config = $this->getJenkins()->get(sprintf('job/%s/config.xml', $this->_jobName));
+        if ($config) {
+            throw new RuntimeException(sprintf('Error during getting configuation for job %s', $this->_jobName));
+        }
+        return $config;
+    }
+
+    /**
+     * @param string $jobname
+     * @param DomDocument $document
+     *
+     * @deprecated use setJobConfig instead
+     */
+    public function setConfigFromDomDocument($jobname, DomDocument $document)
+    {
+        $this->setJobConfig($jobname, $document->saveXML());
+    }
+
+    /**
+     * @param string|array $configuration
+     *
+     */
+    public function setJobConfig($configuration)
+    {
+        $return = $this->getJenkins()->post(sprintf('job/%s/config.xml', $this->_jobName), $configuration, array(CURLOPT_HTTPHEADER => array('Content-Type: text/xml')));
+        if ($return) {
+            throw new RuntimeException(sprintf('Error during setting configuration for job %s', $this->_jobName));
+        }
     }
 
     /**
@@ -201,5 +228,10 @@ class Job extends AbstractItem
     public function getName()
     {
         return $this->get('name');
+    }
+
+    public function __toString()
+    {
+        return $this->_jobName;
     }
 }

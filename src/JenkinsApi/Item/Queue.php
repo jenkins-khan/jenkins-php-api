@@ -1,6 +1,7 @@
 <?php
 namespace JenkinsApi\Item;
 
+use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
 use stdClass;
 
@@ -11,7 +12,7 @@ use stdClass;
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
  */
-class Queue
+class Queue extends AbstractItem
 {
     /**
      * @var stdClass
@@ -24,13 +25,21 @@ class Queue
     protected $_jenkins;
 
     /**
-     * @param stdClass $queue
      * @param Jenkins  $jenkins
      */
-    public function __construct($queue, Jenkins $jenkins)
+    public function __construct(Jenkins $jenkins)
     {
-        $this->_queue = $queue;
         $this->_jenkins = $jenkins;
+
+        $this->refresh();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUrl()
+    {
+        return 'queue/api/json';
     }
 
     /**
@@ -39,19 +48,10 @@ class Queue
     public function getJobQueues()
     {
         $jobs = array();
-
-        foreach ($this->_queue->items as $item) {
+        foreach ($this->get('items') as $item) {
             $jobs[] = new JobQueue($item, $this->getJenkins());
         }
 
         return $jobs;
-    }
-
-    /**
-     * @return Jenkins
-     */
-    public function getJenkins()
-    {
-        return $this->_jenkins;
     }
 }

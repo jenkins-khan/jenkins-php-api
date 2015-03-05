@@ -3,6 +3,7 @@ namespace JenkinsApi\Item;
 
 use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
+use RuntimeException;
 use stdClass;
 
 /**
@@ -52,12 +53,14 @@ class Node extends AbstractItem
     }
 
     /**
-     *
      * @return Node
      */
     public function toggleOffline()
     {
-        $this->getJenkins()->post(sprintf('computer/%s/toggleOffline', $this->_nodeName));
+        $response = $this->getJenkins()->post(sprintf('computer/%s/toggleOffline', $this->_nodeName));
+        if($response) {
+            throw new RuntimeException(sprintf('Error marking %s offline', $this->_nodeName));
+        }
         return $this;
     }
 

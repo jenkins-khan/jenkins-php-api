@@ -1,6 +1,7 @@
 <?php
 namespace JenkinsApi\Item;
 
+use JenkinsApi\AbstractItem;
 use JenkinsApi\Jenkins;
 use stdClass;
 
@@ -11,26 +12,31 @@ use stdClass;
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
  */
-class View
+class View extends AbstractItem
 {
     /**
-     * @var stdClass
+     * @var string
      */
-    private $_view;
+    private $_name;
 
     /**
-     * @var Jenkins
-     */
-    protected $_jenkins;
-
-    /**
-     * @param stdClass $view
+     * @param string $name
      * @param Jenkins  $jenkins
      */
-    public function __construct($view, Jenkins $jenkins)
+    public function __construct($name, Jenkins $jenkins)
     {
-        $this->_view = $view;
+        $this->_name = $name;
         $this->_jenkins = $jenkins;
+
+        $this->refresh();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUrl()
+    {
+        return sprintf('view/%s/api/json', $this->_name);
     }
 
     /**
@@ -38,7 +44,7 @@ class View
      */
     public function getName()
     {
-        return $this->_view->name;
+        return $this->name;
     }
 
     /**
@@ -47,11 +53,9 @@ class View
     public function getJobs()
     {
         $jobs = array();
-
-        foreach ($this->_view->jobs as $job) {
-            $jobs[] = $this->_jenkins->getJob($job->name);
+        foreach ($this->get('jobs') as $job) {
+            $jobs[] = new Job($job->name, $this);
         }
-
         return $jobs;
     }
 
@@ -63,7 +67,7 @@ class View
     public function getColor()
     {
         $color = 'blue';
-        foreach ($this->_view->jobs as $job) {
+        foreach ($this->get('jobs') as $job) {
             if ($this->getColorPriority($job->color) > $this->getColorPriority($color)) {
                 $color = $job->color;
             }
@@ -99,5 +103,4 @@ class View
                 return 0;
         }
     }
-
 }

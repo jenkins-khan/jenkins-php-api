@@ -2,6 +2,7 @@
 namespace JenkinsApi\Item;
 
 use JenkinsApi\Jenkins;
+use RuntimeException;
 use stdClass;
 
 /**
@@ -73,7 +74,10 @@ class JobQueue
      */
     public function cancel()
     {
-        $this->getJenkins()->cancelQueue($this);
+        $response = $this->getJenkins()->post(sprintf('queue/item/%s/cancelQueue', $this->getId()));
+        if ($response) {
+            throw new RuntimeException(sprintf('Error durring stopping job queue #%s', $this->getId()));
+        }
     }
 
     /**

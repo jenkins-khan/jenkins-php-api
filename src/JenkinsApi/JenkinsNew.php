@@ -11,8 +11,12 @@
 
 namespace JenkinsApi;
 
+use InvalidArgumentException;
+use JenkinsApi\Item\Build;
 use JenkinsApi\Item\Job;
+use JenkinsApi\Item\Node;
 use JenkinsApi\Item\Queue;
+use JenkinsApi\Item\View;
 use RuntimeException;
 use stdClass;
 
@@ -72,6 +76,16 @@ class Jenkins
     }
 
     /**
+     * @param string|Job $jobName
+     * @param int|string $buildNumber
+     * @return Build
+     */
+    public function getBuild($jobName, $buildNumber)
+    {
+        return new Build($buildNumber, $jobName, $this);
+    }
+
+    /**
      * @param string $jobName
      *
      * @return Job
@@ -109,9 +123,9 @@ class Jenkins
 
     /**
      * @param string $url
-     * @param int    $depth
-     * @param array  $params
-     * @param array  $curlOpts
+     * @param int $depth
+     * @param array $params
+     * @param array $curlOpts
      *
      * @throws RuntimeException
      * @return stdClass
@@ -125,7 +139,7 @@ class Jenkins
             }
         }
         $curl = curl_init($url);
-        if($curlOpts) {
+        if ($curlOpts) {
             curl_setopt_array($curl, $curlOpts);
         }
 
@@ -151,8 +165,8 @@ class Jenkins
 
     /**
      * @param string $url
-     * @param array  $parameters
-     * @param array  $curlOpts
+     * @param array $parameters
+     * @param array $curlOpts
      *
      * @throws RuntimeException
      * @return bool
@@ -160,26 +174,22 @@ class Jenkins
     public function post($url, array $parameters = [], array $curlOpts = [])
     {
         $curl = curl_init($url);
-        if($curlOpts) {
+        if ($curlOpts) {
             curl_setopt_array($curl, $curlOpts);
         }
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($parameters));
 
-        $headers = array();
+        $headers = (isset($curlOpts[CURLOPT_HTTPHEADER])) ? $curlOpts[CURLOPT_HTTPHEADER] : array();
 
         if ($this->areCrumbsEnabled()) {
             $headers[] = $this->getCrumbHeader();
         }
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_exec($curl);
+        $return = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new RuntimeException(sprintf('Error trying to launch job "%s" (%s)', $parameters['name'], $url));
-        }
-
-        return true;
+        return (curl_errno($curl)) ?: $return;
     }
 
     /**
@@ -286,8 +296,7 @@ class Jenkins
      */
     public function getCurrentlyBuildingJobs()
     {
-        $url = sprintf("%s", $this->_baseUrl)
-            . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),\%22_anime\%22)]&wrapper=jobs";
+        $url = sprintf("%s", $this->_baseUrl) . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),\%22_anime\%22)]&wrapper=jobs";
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -306,6 +315,92 @@ class Jenkins
         }
 
         return $buildingJobs;
+    }
+
+    /**
+     * @return View[]
+     */
+    public function getViews()
+    {
+        $data = $this->get('api/json');
+        $views = array();
+        foreach ($data->views as $view) {
+            $views[] = $this->getView($view->name);
+        }
+        return $views;
+    }
+
+    /**
+     * @return View|null
+     */
+    public function getPrimaryView()
+    {
+        $data = $this->get('api/json');
+
+        $primaryView = null;
+        if (property_exists($data, 'primaryView')) {
+            $primaryView = $this->getView($data->primaryView->name);
+        }
+
+        return $primaryView;
+    }
+
+    /**
+     * @param string $jobname
+     * @param string $xmlConfiguration
+     *
+     * @throws InvalidArgumentException
+     * @return void
+     */
+    public function createJob($jobname, $xmlConfiguration)
+    {
+        $url = sprintf('%s/createItem?name=%s', $this->getBaseUrl(), $jobname);
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_POST, 1);
+
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $xmlConfiguration);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        $headers = array('Content-Type: text/xml');
+
+        if ($this->areCrumbsEnabled()) {
+            $headers[] = $this->getCrumbHeader();
+        }
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+        $response = curl_exec($curl);
+
+        if (curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
+            throw new InvalidArgumentException(sprintf('Job %s already exists', $jobname));
+        }
+        if (curl_errno($curl)) {
+            throw new RuntimeException(sprintf('Error creating job %s', $jobname));
+        }
+    }
+
+    /**
+     * @return Node[]
+     */
+    public function getNodes()
+    {
+        $data = json_decode($this->get('computer/api/json'));
+        $nodes = array();
+        foreach ($data->computer as $node) {
+            $nodes[] = new Node($node->displayName, $this);
+        }
+        return $nodes;
+    }
+
+    /**
+     * @param string $viewName
+     *
+     * @return View
+     * @throws RuntimeException
+     */
+    public function getView($viewName)
+    {
+        return new View($viewName, $this);
     }
 
     /**
