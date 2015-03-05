@@ -43,7 +43,7 @@ class Queue extends AbstractItem
     }
 
     /**
-     * @return array
+     * @return JobQueue[]
      */
     public function getJobQueues()
     {

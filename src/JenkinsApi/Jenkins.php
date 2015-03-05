@@ -132,7 +132,8 @@ class Jenkins
      */
     public function get($url, $depth = 1, $params = array(), array $curlOpts = [])
     {
-        $url = sprintf('%s' . $url . '?depth=' . $depth, $this->_baseUrl);
+//        $url = str_replace(' ', '%20', sprintf('%s' . $url . '?depth=' . $depth, $this->_baseUrl));
+        $url = sprintf('%s', $this->_baseUrl) . $url . '?depth=' . $depth;
         if ($params) {
             foreach ($params as $key => $val) {
                 $url .= '&' . $key . '=' . $val;
@@ -142,7 +143,7 @@ class Jenkins
         if ($curlOpts) {
             curl_setopt_array($curl, $curlOpts);
         }
-
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
 
@@ -186,6 +187,7 @@ class Jenkins
             $headers[] = $this->getCrumbHeader();
         }
 
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         $return = curl_exec($curl);
 
@@ -274,25 +276,9 @@ class Jenkins
     }
 
     /**
-     * Get a list of all available jobs
-     *
-     * @throws RuntimeException
-     * @return array
-     */
-    public function getAllJobs()
-    {
-        $jobs = array();
-        $result = $this->get('api/json', 0);
-        foreach ($result as $job) {
-            $jobs[$job->name] = new Job($job->name, $this);
-        }
-        return $jobs;
-    }
-
-    /**
      * Get the currently building jobs
      *
-     * @return array
+     * @return Job[]
      */
     public function getCurrentlyBuildingJobs()
     {

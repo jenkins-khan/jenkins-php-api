@@ -47,7 +47,7 @@ class Executor extends AbstractItem
      */
     protected function getUrl()
     {
-        return sprintf('computer/%s/executors/%s/api/json', $this->_nodeName, $this->_executorId);
+        return sprintf('computer/%s/executors/%s/api/json', rawurlencode($this->_nodeName), rawurlencode($this->_executorId));
     }
 
     /**

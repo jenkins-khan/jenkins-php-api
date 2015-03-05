@@ -36,7 +36,7 @@ class View extends AbstractItem
      */
     protected function getUrl()
     {
-        return sprintf('view/%s/api/json', $this->_name);
+        return sprintf('view/%s/api/json', rawurlencode($this->_name));
     }
 
     /**

@@ -37,7 +37,7 @@ class Node extends AbstractItem
      */
     protected function getUrl()
     {
-        return sprintf('computer/%s/api/json', $this->_nodeName);
+        return sprintf('computer/%s/api/json', rawurlencode($this->_nodeName));
     }
 
     /**

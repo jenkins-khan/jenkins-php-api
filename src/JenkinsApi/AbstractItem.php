@@ -37,7 +37,7 @@ abstract class AbstractItem
      */
     public function refresh()
     {
-        $this->_data = $this->$this->_jenkins->get($this->getUrl());
+        $this->_data = $this->getJenkins()->get($this->getUrl());
         return $this;
     }
 

@@ -16,13 +16,6 @@ use RuntimeException;
 class Job extends AbstractItem
 {
     /**
-     * @var int
-     */
-    protected $_timeoutSeconds = 86400;
-
-    protected $_checkIntervalSeconds = 5;
-
-    /**
      * @var
      */
     private $_jobName;
@@ -33,7 +26,7 @@ class Job extends AbstractItem
      */
     public function __construct($jobName, Jenkins $jenkins)
     {
-        $this->jobName = $jobName;
+        $this->_jobName = $jobName;
         $this->_jenkins = $jenkins;
 
         $this->refresh();
@@ -44,7 +37,7 @@ class Job extends AbstractItem
      */
     protected function getUrl()
     {
-        return sprintf('job/%s/api/json', $this->_jobName);
+        return sprintf('job/%s/api/json', rawurlencode($this->_jobName));
     }
 
     /**
@@ -145,9 +138,11 @@ class Job extends AbstractItem
     /**
      * @param array $parameters
      *
-     * @return Build|bool
+     * @param int $timeoutSeconds
+     * @param int $checkIntervalSeconds
+     * @return bool|Build
      */
-    public function launchAndWait($parameters = array())
+    public function launchAndWait($parameters = array(), $timeoutSeconds = 86400, $checkIntervalSeconds = 5)
     {
         if (!$this->isCurrentlyBuilding()) {
             $lastNumber = $this->getLastBuild()->getNumber();
@@ -156,8 +151,8 @@ class Job extends AbstractItem
 
             $build = $this->getLastBuild();
 
-            while ((time() < $startTime + $this->_timeoutSeconds) && ($build->getNumber() == $lastNumber + 1 && !$build->isBuilding())) {
-                sleep($this->_checkIntervalSeconds);
+            while ((time() < $startTime + $timeoutSeconds) && ($build->getNumber() == $lastNumber + 1 && !$build->isBuilding())) {
+                sleep($checkIntervalSeconds);
                 $build->refresh();
             }
 
