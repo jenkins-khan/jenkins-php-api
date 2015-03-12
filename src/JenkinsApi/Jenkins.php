@@ -459,7 +459,7 @@ class Jenkins
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     public function isVerbose()
     {
@@ -467,7 +467,7 @@ class Jenkins
     }
 
     /**
-     * @param bool $verbose
+     * @param boolean $verbose
      */
     public function setVerbose($verbose)
     {
