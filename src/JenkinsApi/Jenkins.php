@@ -30,6 +30,11 @@ use stdClass;
 class Jenkins
 {
     /**
+     * @var bool
+     */
+    private $_verbose = false;
+
+    /**
      * @var string
      */
     private $_baseUrl;
@@ -451,5 +456,21 @@ class Jenkins
     public function setBaseUrl($baseUrl)
     {
         $this->_baseUrl = $baseUrl;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVerbose()
+    {
+        return $this->_verbose;
+    }
+
+    /**
+     * @param bool $verbose
+     */
+    public function setVerbose($verbose)
+    {
+        $this->_verbose = $verbose;
     }
 }
