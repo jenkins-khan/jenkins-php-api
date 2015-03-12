@@ -175,6 +175,8 @@ class Jenkins
      */
     public function post($url, array $parameters = [], array $curlOpts = [])
     {
+        $url = sprintf('%s', $this->_baseUrl) . $url;
+
         $curl = curl_init($url);
         if ($curlOpts) {
             curl_setopt_array($curl, $curlOpts);
