@@ -78,6 +78,7 @@ class Jenkins
     /**
      * @param string|Job $jobName
      * @param int|string $buildNumber
+     *
      * @return Build
      */
     public function getBuild($jobName, $buildNumber)
@@ -123,9 +124,9 @@ class Jenkins
 
     /**
      * @param string $url
-     * @param int $depth
-     * @param array $params
-     * @param array $curlOpts
+     * @param int    $depth
+     * @param array  $params
+     * @param array  $curlOpts
      *
      * @throws RuntimeException
      * @return stdClass
@@ -166,8 +167,8 @@ class Jenkins
 
     /**
      * @param string $url
-     * @param array $parameters
-     * @param array $curlOpts
+     * @param array  $parameters
+     * @param array  $curlOpts
      *
      * @throws RuntimeException
      * @return bool
@@ -282,7 +283,8 @@ class Jenkins
      */
     public function getCurrentlyBuildingJobs()
     {
-        $url = sprintf("%s", $this->_baseUrl) . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),\%22_anime\%22)]&wrapper=jobs";
+        $url = sprintf("%s", $this->_baseUrl)
+            . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),\%22_anime\%22)]&wrapper=jobs";
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -376,6 +378,24 @@ class Jenkins
             $nodes[] = new Node($node->displayName, $this);
         }
         return $nodes;
+    }
+
+    /**
+     * Go into prepare shutdown mode.
+     * This prevents new jobs beeing started
+     */
+    public function prepareShutdown()
+    {
+        $this->post('quietDown');
+    }
+
+    /**
+     * Exit prepare shutdown mode
+     * This allows jobs beeing started after shutdown prepare (but before actual restart)
+     */
+    public function cancelPrepareShutdown()
+    {
+        $this->post('cancelQuietDown');
     }
 
     /**
