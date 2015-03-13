@@ -17,8 +17,10 @@ First you need to instantiate the connection:
 If your Jenkins needs authentication, you need to pass a URL like this : `'http://user:token@host.org:8080'`.
 
 
-
-Here are some examples of how to use it:
+There are always two ways to instanciate an item and get the data you want:
+ 
+1. Use the classes directly (`new Job('myjob', $jenkins)`). In this case you have to instanciate Jenkins first and pass it as second constructor argument.
+2. Use methods of Jenkins: `(new Jenkins('myurl'))->getJob('myjob')`
 
 Get the color of the job
 ------------------------
@@ -33,8 +35,14 @@ Get the color of the job
 Launch a Job
 ------------
 
+Will launch the job and return imidiatly
 ```php
-    $job = $jenkins->launchJob("clone-deploy");
+    $job = $jenkins->getJob("clone-deploy")->launch();
+```
+
+Will launch the job and wait until the job is finished
+```php
+    $job = $jenkins->getJob("clone-deploy")->launch();
 ```
 
 
