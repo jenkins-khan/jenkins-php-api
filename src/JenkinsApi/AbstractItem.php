@@ -84,4 +84,11 @@ abstract class AbstractItem
     {
         return array_key_exists($property, $this->_data);
     }
+
+    public function __call($name, $args = array())
+    {
+        if(strlen($name) > 3 && substr($name, 0, 3) === 'get') {
+            return $this->get(lcfirst(substr($name, 3)));
+        }
+    }
 }
