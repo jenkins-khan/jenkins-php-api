@@ -10,6 +10,9 @@ use JenkinsApi\Jenkins;
  * @package    JenkinsApi\Item
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
+ *
+ * @method int getNumber()
+ * @method string getBuiltOn()
  */
 class Build extends AbstractItem
 {
@@ -203,19 +206,11 @@ class Build extends AbstractItem
     }
 
     /**
-     * @return string
-     */
-    public function getBuiltOn()
-    {
-        return $this->get('builtOn');
-    }
-
-    /**
      * @return bool
      */
     public function isBuilding()
     {
-        return (bool)$this->get('building');
+        return (bool) $this->get('building');
     }
 
     /**
@@ -232,14 +227,6 @@ class Build extends AbstractItem
     public function getDuration()
     {
         return $this->get('duration') / 1000;
-    }
-
-    /**
-     * @return int
-     */
-    public function getNumber()
-    {
-        return $this->get('number');
     }
 
     /**

@@ -12,6 +12,8 @@ use stdClass;
  * @package    JenkinsApi\Item
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
+ *
+ * @method null|stdClass getOfflineCause() null when computer is launching, tdClass when computer has been put offline
  */
 class Node extends AbstractItem
 {
@@ -97,17 +99,5 @@ class Node extends AbstractItem
     public function isOffline()
     {
         return (bool)$this->get('offline');
-    }
-
-    /**
-     *
-     * returns null when computer is launching
-     * returns stdClass when computer has been put offline
-     *
-     * @return null|stdClass
-     */
-    public function getOfflineCause()
-    {
-        return $this->get('offlineCause');
     }
 }

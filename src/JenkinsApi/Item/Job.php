@@ -12,6 +12,9 @@ use RuntimeException;
  * @package    JenkinsApi\Item
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
+ *
+ * @method string getName()
+ * @method string getColor()
  */
 class Job extends AbstractItem
 {
@@ -208,22 +211,6 @@ class Job extends AbstractItem
     public function isBuildable()
     {
         return $this->_data->buildable;
-    }
-
-    /**
-     * @return string
-     */
-    public function getColor()
-    {
-        return $this->get('color');
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->get('name');
     }
 
     public function __toString()

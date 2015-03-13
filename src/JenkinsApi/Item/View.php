@@ -44,7 +44,7 @@ class View extends AbstractItem
      */
     public function getName()
     {
-        return $this->name;
+        return $this->_name;
     }
 
     /**

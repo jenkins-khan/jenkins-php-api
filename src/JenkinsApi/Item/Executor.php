@@ -11,6 +11,9 @@ use RuntimeException;
  * @package    JenkinsApi\Item
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
+ *
+ * @method int getProgress()
+ * @method int getNumber()
  */
 class Executor extends AbstractItem
 {
@@ -60,23 +63,6 @@ class Executor extends AbstractItem
         }
         return $this->_node;
     }
-
-    /**
-     * @return int
-     */
-    public function getProgress()
-    {
-        return $this->get('progress');
-    }
-
-    /**
-     * @return int
-     */
-    public function getNumber()
-    {
-        return $this->get('number');
-    }
-
 
     /**
      * @return int|null
