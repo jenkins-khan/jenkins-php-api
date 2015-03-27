@@ -57,8 +57,8 @@ class Build extends AbstractItem
     protected $_jobName;
 
     /**
-     * @param string  $buildNumber
-     * @param string  $jobName
+     * @param string $buildNumber
+     * @param string $jobName
      * @param Jenkins $jenkins
      */
     public function __construct($buildNumber, $jobName, Jenkins $jenkins)
@@ -210,7 +210,16 @@ class Build extends AbstractItem
      */
     public function isBuilding()
     {
-        return (bool) $this->get('building');
+        return (bool)$this->get('building');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFinished()
+    {
+        $finishedStates = array(self::ABORTED, self::FAILURE, self::SUCCESS, self::UNSTABLE);
+        return in_array($this->getResult(), $finishedStates);
     }
 
     /**
