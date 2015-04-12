@@ -74,3 +74,9 @@ Check if Jenkins is available
 ```
 
 For more information, see the [Jenkins API](https://wiki.jenkins-ci.org/display/JENKINS/Remote+access+API).
+
+
+Coding standards
+----------------
+
+This projects follows PSR-0, PSR-1, PSR-2, PSR-4

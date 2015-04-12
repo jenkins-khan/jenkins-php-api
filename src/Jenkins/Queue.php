@@ -6,59 +6,58 @@ use JenkinsKhan\Jenkins;
 
 class Queue
 {
-  /**
-   * @var \stdClass
-   */
-  private $queue;
 
-  /**
-   * @var Jenkins
-   */
-  protected $jenkins;
+    /**
+     * @var \stdClass
+     */
+    private $queue;
 
-  /**
-   * @param \stdClass $queue
-   * @param Jenkins  $jenkins
-   */
-  public function __construct($queue, Jenkins $jenkins)
-  {
-    $this->queue = $queue;
-    $this->setJenkins($jenkins);
-  }
-  
-  /**
-   * @return array
-   */
-  public function getJobQueues()
-  {
-    $jobs = array();
-    
-    foreach ($this->queue->items as $item)
+    /**
+     * @var Jenkins
+     */
+    protected $jenkins;
+
+    /**
+     * @param \stdClass $queue
+     * @param Jenkins   $jenkins
+     */
+    public function __construct($queue, Jenkins $jenkins)
     {
-      $jobs[] = new JobQueue($item, $this->getJenkins());
+        $this->queue = $queue;
+        $this->setJenkins($jenkins);
     }
-    
-    return $jobs;
-  }
 
-  /**
-   * @return Jenkins
-   */
-  public function getJenkins()
-  {
-    return $this->jenkins;
-  }
+    /**
+     * @return array
+     */
+    public function getJobQueues()
+    {
+        $jobs = array();
 
-  /**
-   * @param Jenkins $jenkins
-   * 
-   * @return Queue
-   */
-  public function setJenkins(Jenkins $jenkins)
-  {
-    $this->jenkins = $jenkins;
+        foreach ($this->queue->items as $item) {
+            $jobs[] = new JobQueue($item, $this->getJenkins());
+        }
 
-    return $this;
-  }
+        return $jobs;
+    }
 
+    /**
+     * @return Jenkins
+     */
+    public function getJenkins()
+    {
+        return $this->jenkins;
+    }
+
+    /**
+     * @param Jenkins $jenkins
+     *
+     * @return Queue
+     */
+    public function setJenkins(Jenkins $jenkins)
+    {
+        $this->jenkins = $jenkins;
+
+        return $this;
+    }
 }
