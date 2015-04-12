@@ -1,10 +1,14 @@
 <?php
 
-class Jenkins_Computer
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class Computer
 {
 
   /**
-   * @var stdClass
+   * @var \stdClass
    */
   private $computer;
 
@@ -15,7 +19,7 @@ class Jenkins_Computer
 
 
   /**
-   * @param stdClass $computer
+   * @param \stdClass $computer
    * @param Jenkins  $jenkins
    */
   public function __construct($computer, Jenkins $jenkins)
@@ -44,9 +48,9 @@ class Jenkins_Computer
   /**
    *
    * returns null when computer is launching
-   * returns stdClass when computer has been put offline
+   * returns \stdClass when computer has been put offline
    *
-   * @return null|stdClass
+   * @return null|\stdClass
    */
   public function getOfflineCause()
   {
@@ -55,7 +59,7 @@ class Jenkins_Computer
 
   /**
    *
-   * @return Jenkins_Computer
+   * @return Computer
    */
   public function toggleOffline()
   {
@@ -66,7 +70,7 @@ class Jenkins_Computer
 
   /**
    *
-   * @return Jenkins_Computer
+   * @return Computer
    */
   public function delete()
   {
@@ -86,7 +90,7 @@ class Jenkins_Computer
   /**
    * @param Jenkins $jenkins
    *
-   * @return Jenkins_Computer
+   * @return Computer
    */
   public function setJenkins(Jenkins $jenkins)
   {

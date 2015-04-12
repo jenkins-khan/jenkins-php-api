@@ -1,6 +1,10 @@
 <?php
- 
-class Jenkins_Build 
+
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class Build
 {
   /**
    * @var string
@@ -33,7 +37,7 @@ class Jenkins_Build
   const ABORTED = 'ABORTED';
   
   /**
-   * @var stdClass 
+   * @var \stdClass 
    */
   private $build;
   
@@ -44,7 +48,7 @@ class Jenkins_Build
 
 
   /**
-   * @param stdClass   $build
+   * @param \stdClass   $build
    * @param Jenkins $jenkins
    */
   public function __construct($build, Jenkins $jenkins)
@@ -168,22 +172,22 @@ class Jenkins_Build
     switch($this->build->result)
     {
       case 'FAILURE':
-        $result = Jenkins_Build::FAILURE;
+        $result = Build::FAILURE;
         break;      
       case 'SUCCESS':
-        $result = Jenkins_Build::SUCCESS;
+        $result = Build::SUCCESS;
         break;      
       case 'UNSTABLE':
-        $result = Jenkins_Build::UNSTABLE;
+        $result = Build::UNSTABLE;
         break;       
       case 'ABORTED':
-        $result = Jenkins_Build::ABORTED;
+        $result = Build::ABORTED;
         break; 
       case 'WAITING':
-        $result = Jenkins_Build::WAITING;
+        $result = Build::WAITING;
         break;
       default:
-        $result = Jenkins_Build::RUNNING;
+        $result = Build::RUNNING;
         break;
     }
     
@@ -199,7 +203,7 @@ class Jenkins_Build
   }
   
   /**
-   * @return Jenkins_Executor|null
+   * @return Executor|null
    */
   public function getExecutor()
   {
@@ -211,7 +215,7 @@ class Jenkins_Build
     $runExecutor = null;
     foreach ($this->getJenkins()->getExecutors() as $executor)
     {
-      /** @var Jenkins_Executor $executor */
+      /** @var Executor $executor */
       
       if ($this->getUrl() === $executor->getBuildUrl())
       {
@@ -227,11 +231,11 @@ class Jenkins_Build
    */
   public function isRunning()
   {
-    return Jenkins_Build::RUNNING === $this->getResult();
+    return Build::RUNNING === $this->getResult();
   }
 
   /**
-   * @return \Jenkins
+   * @return Jenkins
    */
   public function getJenkins()
   {
@@ -239,9 +243,9 @@ class Jenkins_Build
   }
 
   /**
-   * @param \Jenkins $jenkins
+   * @param Jenkins $jenkins
    *
-   * @return Jenkins_Job
+   * @return Job
    */
   public function setJenkins(Jenkins $jenkins)
   {

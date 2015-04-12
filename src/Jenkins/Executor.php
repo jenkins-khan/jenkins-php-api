@@ -1,10 +1,14 @@
 <?php
 
-class Jenkins_Executor
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class Executor
 {
 
   /**
-   * @var stdClass
+   * @var \stdClass
    */
   private $executor;
 
@@ -19,9 +23,9 @@ class Jenkins_Executor
   protected $computer;
 
   /**
-   * @param stdClass $executor
+   * @param \stdClass $executor
    * @param string   $computer
-   * @param \Jenkins $jenkins
+   * @param Jenkins $jenkins
    */
   public function __construct($executor, $computer, Jenkins $jenkins)
   {
@@ -92,7 +96,7 @@ class Jenkins_Executor
   }
   
   /**
-   * @return \Jenkins
+   * @return Jenkins
    */
   public function getJenkins()
   {
@@ -100,9 +104,9 @@ class Jenkins_Executor
   }
 
   /**
-   * @param \Jenkins $jenkins
+   * @param Jenkins $jenkins
    *
-   * @return Jenkins_Job
+   * @return Job
    */
   public function setJenkins(Jenkins $jenkins)
   {

@@ -1,9 +1,13 @@
 <?php
- 
-class Jenkins_Queue 
+
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class Queue
 {
   /**
-   * @var stdClass
+   * @var \stdClass
    */
   private $queue;
 
@@ -13,7 +17,7 @@ class Jenkins_Queue
   protected $jenkins;
 
   /**
-   * @param stdClass $queue
+   * @param \stdClass $queue
    * @param Jenkins  $jenkins
    */
   public function __construct($queue, Jenkins $jenkins)
@@ -31,14 +35,14 @@ class Jenkins_Queue
     
     foreach ($this->queue->items as $item)
     {
-      $jobs[] = new Jenkins_JobQueue($item, $this->getJenkins());
+      $jobs[] = new JobQueue($item, $this->getJenkins());
     }
     
     return $jobs;
   }
 
   /**
-   * @return \Jenkins
+   * @return Jenkins
    */
   public function getJenkins()
   {
@@ -46,9 +50,9 @@ class Jenkins_Queue
   }
 
   /**
-   * @param \Jenkins $jenkins
+   * @param Jenkins $jenkins
    * 
-   * @return \Jenkins_Queue
+   * @return Queue
    */
   public function setJenkins(Jenkins $jenkins)
   {

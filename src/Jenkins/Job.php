@@ -1,10 +1,14 @@
 <?php
 
-class Jenkins_Job
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class Job
 {
   
   /**
-   * @var stdClass
+   * @var \stdClass
    */
   private $job;
 
@@ -14,8 +18,8 @@ class Jenkins_Job
   protected $jenkins;
 
   /**
-   * @param stdClass $job
-   * @param \Jenkins $jenkins
+   * @param \stdClass $job
+   * @param Jenkins $jenkins
    */
   public function __construct($job, Jenkins $jenkins)
   {
@@ -25,7 +29,7 @@ class Jenkins_Job
   }
 
   /**
-   * @return Jenkins_Build[]
+   * @return Build[]
    */
   public function getBuilds()
   {
@@ -42,8 +46,8 @@ class Jenkins_Job
   /**
    * @param int $buildId
    *
-   * @return Jenkins_Build
-   * @throws RuntimeException
+   * @return Build
+   * @throws \RuntimeException
    */
   public function getJenkinsBuild($buildId)
   {
@@ -106,7 +110,7 @@ class Jenkins_Job
   /**
    * @return string
    *
-   * @throws RuntimeException
+   * @throws \RuntimeException
    */
   public function retrieveXmlConfigAsString()
   {
@@ -114,17 +118,17 @@ class Jenkins_Job
   }
 
   /**
-   * @return DOMDocument
+   * @return \DOMDocument
    */
   public function retrieveXmlConfigAsDomDocument()
   {
-    $document = new DOMDocument;
+    $document = new \DOMDocument;
     $document->loadXML($this->retrieveXmlConfigAsString());
     return $document;
   }
 
   /**
-   * @return \Jenkins
+   * @return Jenkins
    */
   public function getJenkins()
   {
@@ -132,9 +136,9 @@ class Jenkins_Job
   }
 
   /**
-   * @param \Jenkins $jenkins
+   * @param Jenkins $jenkins
    *
-   * @return Jenkins_Job
+   * @return Job
    */
   public function setJenkins(Jenkins $jenkins)
   {
@@ -144,7 +148,7 @@ class Jenkins_Job
   }
   
   /**
-   * @return Jenkins_Build|null
+   * @return Build|null
    */
   public function getLastSuccessfulBuild()
   {

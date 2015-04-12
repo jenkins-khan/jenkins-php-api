@@ -1,6 +1,10 @@
 <?php
 
-class Jenkins_TestReport
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class TestReport
 {
 
   /**
@@ -9,7 +13,7 @@ class Jenkins_TestReport
   protected $jenkins;
 
   /**
-   * @var stdClass
+   * @var \stdClass
    */
   protected $testReport;
 
@@ -27,11 +31,11 @@ class Jenkins_TestReport
    * __construct
    *
    * @param Jenkins  $jenkins
-   * @param stdClass $testReport
+   * @param \stdClass $testReport
    * @param string   $jobName
    * @param int      $buildNumber
    */
-  public function __construct(Jenkins $jenkins, stdClass $testReport, $jobName, $buildNumber)
+  public function __construct(Jenkins $jenkins, \stdClass $testReport, $jobName, $buildNumber)
   {
     $this->jenkins     = $jenkins;
     $this->testReport  = $testReport;
@@ -105,7 +109,7 @@ class Jenkins_TestReport
 
   /**
    *
-   * @return stdClass
+   * @return \stdClass
    */
   public function getSuite($id)
   {

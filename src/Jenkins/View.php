@@ -1,9 +1,13 @@
 <?php
 
-class Jenkins_View
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class View
 {
   /**
-   * @var stdClass
+   * @var \stdClass
    */
   private $view;
 
@@ -14,7 +18,7 @@ class Jenkins_View
 
 
   /**
-   * @param stdClass $view
+   * @param \stdClass $view
    * @param Jenkins  $jenkins
    */
   public function __construct($view, Jenkins $jenkins)
@@ -32,7 +36,7 @@ class Jenkins_View
   }
 
   /**
-   * @return Jenkins_Job[]
+   * @return Job[]
    */
   public function getJobs()
   {

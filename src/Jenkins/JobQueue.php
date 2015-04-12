@@ -1,9 +1,13 @@
 <?php
- 
-class Jenkins_JobQueue
+
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class JobQueue
 {
   /**
-   * @var stdClass
+   * @var \stdClass
    */
   private $jobQueue;
 
@@ -14,7 +18,7 @@ class Jenkins_JobQueue
   protected $jenkins;
 
   /**
-   * @param stdClass $jobQueue
+   * @param \stdClass $jobQueue
    * @param Jenkins  $jenkins
    */
   public function __construct($jobQueue, Jenkins $jenkins)
@@ -68,7 +72,7 @@ class Jenkins_JobQueue
   }
   
   /**
-   * @return \Jenkins
+   * @return Jenkins
    */
   public function getJenkins()
   {
@@ -76,7 +80,7 @@ class Jenkins_JobQueue
   }
 
   /**
-   * @param \Jenkins $jenkins
+   * @param Jenkins $jenkins
    */
   public function setJenkins(Jenkins $jenkins)
   {

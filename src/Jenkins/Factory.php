@@ -1,6 +1,10 @@
 <?php
- 
-class Jenkins_Factory 
+
+namespace JenkinsKhan\Jenkins;
+
+use JenkinsKhan\Jenkins;
+
+class Factory
 {
 
   /**
