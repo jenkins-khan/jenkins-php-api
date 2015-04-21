@@ -8,9 +8,7 @@ Before anything, you need to instantiate the client :
 
 
 ```php
-    require_once('Autoload.php');
-    Jenkins_Autoloader::register();
-    $jenkins = new Jenkins('http://host.org:8080');
+    $jenkins = new \JenkinsKhan\Jenkins('http://host.org:8080');
 ```
 
 If your Jenkins needs authentication, you need to pass a URL like this : `'http://user:token@host.org:8080'`.
@@ -76,3 +74,9 @@ Check if Jenkins is available
 ```
 
 For more information, see the [Jenkins API](https://wiki.jenkins-ci.org/display/JENKINS/Remote+access+API).
+
+
+Coding standards
+----------------
+
+This projects follows PSR-0, PSR-1, PSR-2, PSR-4

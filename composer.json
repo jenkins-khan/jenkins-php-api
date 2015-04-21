@@ -1,0 +1,25 @@
+{
+  "name": "jenkins-khan/jenkins-api",
+  "type": "library",
+  "description": "Jenkins PHP API",
+  "keywords": ["jenkins", "api"],
+  "homepage": "https://github.com/jenkins-khan/jenkins-php-api",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "JenkinsKhan\\": "src/"
+    }
+  },
+  "require-dev": {
+    "atoum/atoum": "2.0.1"
+  },
+  "config": {
+    "bin-dir": "bin"
+  },
+  "authors": [
+    {
+      "name": "jenkins-khan",
+      "homepage": "https://github.com/jenkins-khan/jenkins-php-api"
+    }
+  ]
+}
