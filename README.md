@@ -4,6 +4,26 @@ Jenkins PHP API
 
 Jenkins PHP API is a set of classes designed to interact with Jenkins CI using its API.
 
+Installation
+------------
+
+The recommended way to install Jenkins PHP API is through [Composer](http://getcomposer.org).
+
+```bash
+curl -sS https://getcomposer.org/installer | php
+```
+
+Then, run the Composer command to install the latest version:
+
+```bash
+composer.phar require jenkins-khan/jenkins-api
+```
+
+
+Basic Usage
+-----------
+
+
 Before anything, you need to instantiate the client :
 
 
