@@ -84,12 +84,16 @@ class Build extends AbstractItem
     public function getInputParameters()
     {
         $parameters = array();
-        if (($this->get('action')) === null && isset($this->get('action')[0])) {
+        if (($this->get('actions')) === null && isset($this->get('action')[1])) {
             return array();
         }
 
-        foreach ($this->get('action')[0]->parameters as $parameter) {
-            $parameters[$parameter->name] = $parameter->value;
+        foreach ($this->get('actions')[1]->parameters as $parameter) {
+            if(property_exists($parameter, 'value')) {
+                $parameters[$parameter->name] = $parameter->value;
+            } else if(property_exists($parameter, 'number')) {
+                $parameters[$parameter->name] = $parameter->number;
+            }
         }
         return $parameters;
     }
