@@ -84,17 +84,23 @@ class Build extends AbstractItem
     public function getInputParameters()
     {
         $parameters = array();
-        if (($this->get('actions')) === null && isset($this->get('action')[1])) {
-            return array();
+        if (($this->get('actions')) === null || $this->get('actions') === array()) {
+            return $parameters;
         }
 
-        foreach ($this->get('actions')[1]->parameters as $parameter) {
-            if(property_exists($parameter, 'value')) {
-                $parameters[$parameter->name] = $parameter->value;
-            } else if(property_exists($parameter, 'number')) {
-                $parameters[$parameter->name] = $parameter->number;
+        foreach ($this->get('actions') as $action) {
+            if (property_exists($action, 'parameters')) {
+                foreach ($action->parameters as $parameter) {
+                    if (property_exists($parameter, 'value')) {
+                        $parameters[$parameter->name] = $parameter->value;
+                    } elseif (property_exists($parameter, 'number')) {
+                        $parameters[$parameter->name] = $parameter->number;
+                    }
+                }
+                break;
             }
         }
+
         return $parameters;
     }
 
@@ -214,7 +220,7 @@ class Build extends AbstractItem
      */
     public function isBuilding()
     {
-        return (bool) $this->get('building');
+        return (bool)$this->get('building');
     }
 
     /**
