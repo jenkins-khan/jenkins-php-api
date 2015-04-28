@@ -156,10 +156,10 @@ class Job extends AbstractItem
 
             $build = $this->getLastBuild();
             while ((time() < $startTime + $timeoutSeconds)
-                && (($build->getNumber() == $lastNumber)
-                    || ($build->getNumber() == $lastNumber + 1 && $build->isBuilding()))) {
+                && (($this->getLastBuild()->getNumber() == $lastNumber)
+                    || ($this->getLastBuild()->getNumber() == $lastNumber + 1 && $this->getLastBuild()->isBuilding()))) {
                 sleep($checkIntervalSeconds);
-                $build->refresh();
+                $this->refresh();
             }
 
             return $build;
