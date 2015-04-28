@@ -93,8 +93,9 @@ class Build extends AbstractItem
                 foreach ($action->parameters as $parameter) {
                     if (property_exists($parameter, 'value')) {
                         $parameters[$parameter->name] = $parameter->value;
-                    } elseif (property_exists($parameter, 'number')) {
-                        $parameters[$parameter->name] = $parameter->number;
+                    } elseif (property_exists($parameter, 'number') && property_exists($parameter, 'jobName') ) {
+                        $parameters[$parameter->name]['number'] = $parameter->number;
+                        $parameters[$parameter->name]['jobName'] = $parameter->jobName;
                     }
                 }
                 break;
