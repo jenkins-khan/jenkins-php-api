@@ -151,11 +151,13 @@ class Job extends AbstractItem
             $response = $this->launch($parameters);
             // TODO evaluate the response correctly, to get the queued item and later the build
             if($response) {
-                list($header, $body) = explode("\r\n\r\n", $response, 2);
+//                list($header, $body) = explode("\r\n\r\n", $response, 2);
             }
 
             $build = $this->getLastBuild();
-            while ((time() < $startTime + $timeoutSeconds) && ($build->getNumber() == $lastNumber + 1 && !$build->isBuilding())) {
+            while ((time() < $startTime + $timeoutSeconds)
+                && (($build->getNumber() == $lastNumber)
+                    || ($build->getNumber() == $lastNumber + 1 && $build->isBuilding()))) {
                 sleep($checkIntervalSeconds);
                 $build->refresh();
             }
