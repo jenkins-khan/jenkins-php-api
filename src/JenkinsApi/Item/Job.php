@@ -162,7 +162,7 @@ class Job extends AbstractItem
                 $this->refresh();
             }
 
-            return $build;
+            return $this->getLastBuild();
 
         }
         return false;
