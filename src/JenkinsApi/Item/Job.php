@@ -130,9 +130,9 @@ class Job extends AbstractItem
     public function launch($parameters = array())
     {
         if (empty($parameters)) {
-            return $this->_jenkins->post(sprintf('job/%s/build', $this->_jobName));
+            return $this->_jenkins->post(sprintf('job/%s/build', rawurlencode($this->_jobName)));
         } else {
-            return $this->_jenkins->post(sprintf('job/%s/buildWithParameters', $this->_jobName), $parameters);
+            return $this->_jenkins->post(sprintf('job/%s/buildWithParameters', rawurlencode($this->_jobName)), $parameters);
         }
     }
 
