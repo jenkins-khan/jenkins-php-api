@@ -57,8 +57,8 @@ class Build extends AbstractItem
     protected $_jobName;
 
     /**
-     * @param string $buildNumber
-     * @param string $jobName
+     * @param string  $buildNumber
+     * @param string  $jobName
      * @param Jenkins $jenkins
      */
     public function __construct($buildNumber, $jobName, Jenkins $jenkins)
@@ -84,13 +84,24 @@ class Build extends AbstractItem
     public function getInputParameters()
     {
         $parameters = array();
-        if (($this->get('action')) === null && isset($this->get('action')[0])) {
-            return array();
+        if (($this->get('actions')) === null || $this->get('actions') === array()) {
+            return $parameters;
         }
 
-        foreach ($this->get('action')[0]->parameters as $parameter) {
-            $parameters[$parameter->name] = $parameter->value;
+        foreach ($this->get('actions') as $action) {
+            if (property_exists($action, 'parameters')) {
+                foreach ($action->parameters as $parameter) {
+                    if (property_exists($parameter, 'value')) {
+                        $parameters[$parameter->name] = $parameter->value;
+                    } elseif (property_exists($parameter, 'number') && property_exists($parameter, 'jobName') ) {
+                        $parameters[$parameter->name]['number'] = $parameter->number;
+                        $parameters[$parameter->name]['jobName'] = $parameter->jobName;
+                    }
+                }
+                break;
+            }
         }
+
         return $parameters;
     }
 
@@ -211,15 +222,6 @@ class Build extends AbstractItem
     public function isBuilding()
     {
         return (bool)$this->get('building');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFinished()
-    {
-        $finishedStates = array(self::ABORTED, self::FAILURE, self::SUCCESS, self::UNSTABLE);
-        return in_array($this->getResult(), $finishedStates);
     }
 
     /**
