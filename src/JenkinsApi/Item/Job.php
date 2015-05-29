@@ -207,6 +207,20 @@ class Job extends AbstractItem
         }
     }
 
+    public function disable()
+    {
+        if (!$this->getJenkins()->post(sprintf('job/%s/disable', $this->_jobName))) {
+            throw new RuntimeException(sprintf('Error disabling job %s on %s', $this->_jobName, $this->getJenkins()->getBaseUrl()));
+        }
+    }
+
+    public function enable()
+    {
+        if (!$this->getJenkins()->post(sprintf('job/%s/enable', $this->_jobName))) {
+            throw new RuntimeException(sprintf('Error enabling job %s on %s', $this->_jobName, $this->getJenkins()->getBaseUrl()));
+        }
+    }
+
     /**
      * @return boolean
      */
