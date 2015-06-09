@@ -93,7 +93,7 @@ class Build extends AbstractItem
                 foreach ($action->parameters as $parameter) {
                     if (property_exists($parameter, 'value')) {
                         $parameters[$parameter->name] = $parameter->value;
-                    } elseif (property_exists($parameter, 'number') && property_exists($parameter, 'jobName') ) {
+                    } elseif (property_exists($parameter, 'number') && property_exists($parameter, 'jobName')) {
                         $parameters[$parameter->name]['number'] = $parameter->number;
                         $parameters[$parameter->name]['jobName'] = $parameter->jobName;
                     }
@@ -206,6 +206,16 @@ class Build extends AbstractItem
             }
         }
         return $runExecutor;
+    }
+
+    /**
+     * @param $text
+     *
+     * @return bool
+     */
+    public function setDescription($text)
+    {
+        return $this->getJenkins()->post($this->getBuildUrl() . 'submitDescription', array('description' => $text));
     }
 
     /**
