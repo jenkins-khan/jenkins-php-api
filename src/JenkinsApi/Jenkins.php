@@ -13,6 +13,7 @@ namespace JenkinsApi;
 
 use InvalidArgumentException;
 use JenkinsApi\Item\Build;
+use JenkinsApi\Item\Executor;
 use JenkinsApi\Item\Job;
 use JenkinsApi\Item\Node;
 use JenkinsApi\Item\Queue;
@@ -385,6 +386,19 @@ class Jenkins
             $nodes[] = new Node($node->displayName, $this);
         }
         return $nodes;
+    }
+
+    /**
+     * @return Executor[]
+     */
+    public function getExecutors()
+    {
+        $executors = array();
+        foreach ($this->getNodes() as $node) {
+            $executors = array_merge($executors, $node->getExecutors());
+        }
+
+        return $executors;
     }
 
     /**
