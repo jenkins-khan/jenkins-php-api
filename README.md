@@ -2,6 +2,7 @@ Jenkins PHP API
 ===============
 
 This version of the Jenkins PHP API is based on https://github.com/jenkins-khan/jenkins-php-api.
+It's more OOP (means a clearer API) than the original and has some more features.
 
 It wraps the API calls of the Jenkins API.
 
