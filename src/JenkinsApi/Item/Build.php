@@ -215,7 +215,8 @@ class Build extends AbstractItem
      */
     public function setDescription($text)
     {
-        return $this->getJenkins()->post('submitDescription', array('description' => $text));
+        $url = sprintf('job/%s/%s/submitDescription', $this->_jobName, $this->_buildNumber);
+        return $this->getJenkins()->post($url, array('description' => $text));
     }
 
     /**
