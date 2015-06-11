@@ -215,7 +215,7 @@ class Build extends AbstractItem
      */
     public function setDescription($text)
     {
-        return $this->getJenkins()->post($this->getBuildUrl() . 'submitDescription', array('description' => $text));
+        return $this->getJenkins()->post('submitDescription', array('description' => $text));
     }
 
     /**
