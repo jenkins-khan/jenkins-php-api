@@ -279,7 +279,7 @@ class Jenkins
      */
     public function getJob($jobName)
     {
-        $url  = sprintf('%s/job/%s/api/json', $this->baseUrl, $jobName);
+        $url  = sprintf('%s/job/%s/api/json', $this->baseUrl, Jenkins::urlSanitise($jobName));
         $curl = curl_init($url);
 
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
@@ -427,7 +427,9 @@ class Jenkins
         if ($tree !== null) {
             $tree = sprintf('?tree=%s', $tree);
         }
+
         $url  = sprintf('%s/job/%s/%d/api/json%s', $this->baseUrl, $job, $buildId, $tree);
+
         $curl = curl_init($url);
 
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
@@ -825,5 +827,16 @@ class Jenkins
     public function getComputerConfiguration($computerName)
     {
         return $this->execute(sprintf('/computer/%s/config.xml', $computerName), array(\CURLOPT_RETURNTRANSFER => 1,));
+    }
+
+    /**
+     * URL sanitise a given string
+     * @param $string
+     * @return mixed|string
+     */
+    static public function urlSanitise($string){
+        $string = urlencode($string);
+        $string = str_replace("+", "%20", $string);
+        return $string;
     }
 }

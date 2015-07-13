@@ -104,6 +104,32 @@ class Build
     }
 
     /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->build->description;
+    }
+
+    public function getGitRevision()
+    {
+        foreach($this->build->actions as $action){
+            if(property_exists($action, 'buildsByBranchName')){
+                return $action->lastBuiltRevision->SHA1;
+            }
+        }
+    }
+
+    public function getGitBranch()
+    {
+        foreach($this->build->actions as $action){
+            if(property_exists($action, 'buildsByBranchName')){
+                return $action->lastBuiltRevision->branch[0]->name;
+            }
+        }
+    }
+
+    /**
      * @return null|int
      */
     public function getProgress()
