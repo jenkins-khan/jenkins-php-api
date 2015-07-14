@@ -129,6 +129,15 @@ class Build
         }
     }
 
+    public function getGitRemoteURL()
+    {
+        foreach($this->build->actions as $action){
+            if(property_exists($action, 'buildsByBranchName')){
+                return $action->remoteUrls[0];
+            }
+        }
+    }
+
     /**
      * @return null|int
      */
