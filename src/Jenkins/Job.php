@@ -50,7 +50,7 @@ class Job
      */
     public function getJenkinsBuild($buildId)
     {
-        return $this->getJenkins()->getBuild($this->getName(), $buildId);
+        return $this->getJenkins()->getBuild($this->getNameURLSafe(), $buildId);
     }
 
     /**
@@ -59,6 +59,15 @@ class Job
     public function getName()
     {
         return $this->job->name;
+    }
+
+    /**
+     * Return a version of the name that is safe for URLs.
+     * @return string
+     */
+    public function getNameURLSafe()
+    {
+        return Jenkins::urlSanitise($this->getName());
     }
 
     /**
@@ -110,7 +119,7 @@ class Job
      */
     public function retrieveXmlConfigAsString()
     {
-        return $this->jenkins->retrieveXmlConfigAsString($this->getName());
+        return $this->jenkins->retrieveXmlConfigAsString($this->getNameURLSafe());
     }
 
     /**
