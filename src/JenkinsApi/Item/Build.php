@@ -224,7 +224,7 @@ class Build extends AbstractItem
      */
     public function getConsoleTextBuild()
     {
-        return $this->getJenkins()->get(sprintf('job/%s/%s/consoleText', $this->_jobName, $this->_buildNumber));
+        return $this->getJenkins()->get(sprintf('job/%s/%s/consoleText', $this->_jobName, $this->_buildNumber), 1, array(), array(), true);
     }
 
     /**
