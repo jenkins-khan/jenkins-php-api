@@ -133,11 +133,12 @@ class Jenkins
      * @param int    $depth
      * @param array  $params
      * @param array  $curlOpts
+     * @param bool   $raw
      *
      * @throws RuntimeException
      * @return stdClass
      */
-    public function get($url, $depth = 1, $params = array(), array $curlOpts = [])
+    public function get($url, $depth = 1, $params = array(), array $curlOpts = [], $raw = false)
     {
 //        $url = str_replace(' ', '%20', sprintf('%s' . $url . '?depth=' . $depth, $this->_baseUrl));
         $url = sprintf('%s', $this->_baseUrl) . $url . '?depth=' . $depth;
@@ -162,6 +163,9 @@ class Jenkins
 
         if (curl_errno($curl)) {
             throw new RuntimeException(sprintf('Error during getting information from url %s', $url));
+        }
+        if($raw) {
+            return $ret;
         }
         $data = json_decode($ret);
         if (!$data instanceof stdClass) {
