@@ -158,13 +158,19 @@ class Jenkins
         $response_info = curl_getinfo($curl);
 
         if (200 != $response_info['http_code']) {
-            throw new RuntimeException(sprintf('Error during getting information from url %s', $url));
+            throw new RuntimeException(
+                sprintf(
+                    'Error during getting information from url %s (Response: %s)', $url, $response_info['http_code']
+                )
+            );
         }
 
         if (curl_errno($curl)) {
-            throw new RuntimeException(sprintf('Error during getting information from url %s', $url));
+            throw new RuntimeException(
+                sprintf('Error during getting information from url %s (%s)', $url, curl_error($curl))
+            );
         }
-        if($raw) {
+        if ($raw) {
             return $ret;
         }
         $data = json_decode($ret);
@@ -302,10 +308,12 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
 
-        $errorMessage = sprintf('Error during getting all currently building jobs on %s', $this->_baseUrl);
-
         if (curl_errno($curl)) {
-            throw new RuntimeException($errorMessage);
+            throw new RuntimeException(
+                sprintf(
+                    'Error during getting all currently building jobs on %s (%s)', $this->_baseUrl, curl_error($curl)
+                )
+            );
         }
         $xml = simplexml_load_string($ret);
         $builds = $xml->xpath('/jobs');
@@ -375,7 +383,7 @@ class Jenkins
             throw new InvalidArgumentException(sprintf('Job %s already exists', $jobname));
         }
         if (curl_errno($curl)) {
-            throw new RuntimeException(sprintf('Error creating job %s', $jobname));
+            throw new RuntimeException(sprintf('Error creating job %s (%s)', $jobname, curl_error($curl)));
         }
     }
 
