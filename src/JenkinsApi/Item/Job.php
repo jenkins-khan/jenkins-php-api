@@ -196,7 +196,7 @@ class Job extends AbstractItem
     }
 
     /**
-     * @param string|array $configuration
+     * @param string $configuration config XML
      *
      */
     public function setJobConfig($configuration)

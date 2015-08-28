@@ -172,13 +172,13 @@ class Jenkins
 
     /**
      * @param string $url
-     * @param array  $parameters
+     * @param array|string  $parameters
      * @param array  $curlOpts
      *
      * @throws RuntimeException
      * @return bool
      */
-    public function post($url, array $parameters = [], array $curlOpts = [])
+    public function post($url, $parameters = [], array $curlOpts = [])
     {
         $url = sprintf('%s', $this->_baseUrl) . $url;
 
@@ -187,7 +187,10 @@ class Jenkins
             curl_setopt_array($curl, $curlOpts);
         }
         curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($parameters));
+        if(is_array($parameters)) {
+            $parameters = http_build_query($parameters);
+        }
+        curl_setopt($curl, CURLOPT_POSTFIELDS,$parameters);
 
         $headers = (isset($curlOpts[CURLOPT_HTTPHEADER])) ? $curlOpts[CURLOPT_HTTPHEADER] : array();
 
