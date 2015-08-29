@@ -198,13 +198,13 @@ class Job extends AbstractItem
     }
 
     /**
-     * @param string|array $configuration
+     * @param string $configuration config XML
      *
      */
     public function setJobConfig($configuration)
     {
         $return = $this->getJenkins()->post(sprintf('job/%s/config.xml', $this->_jobName), $configuration, array(CURLOPT_HTTPHEADER => array('Content-Type: text/xml')));
-        if ($return) {
+        if ($return != 1) {
             throw new RuntimeException(sprintf('Error during setting configuration for job %s', $this->_jobName));
         }
     }
