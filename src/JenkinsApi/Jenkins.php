@@ -305,7 +305,7 @@ class Jenkins
     public function getCurrentlyBuildingJobs()
     {
         $url = sprintf("%s", $this->_baseUrl)
-            . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),\%22_anime\%22)]&wrapper=jobs";
+            . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),%22_anime%22)]&wrapper=jobs";
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
