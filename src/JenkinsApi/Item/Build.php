@@ -64,7 +64,7 @@ class Build extends AbstractItem
     public function __construct($buildNumber, $jobName, Jenkins $jenkins)
     {
         $this->_buildNumber = $buildNumber;
-        $this->_jobName = $jobName;
+        $this->_jobName = (string) $jobName;
         $this->_jenkins = $jenkins;
 
         $this->refresh();
@@ -240,7 +240,7 @@ class Build extends AbstractItem
      */
     public function getTimestamp()
     {
-        return $this->get('timestamp') / 1000;
+        return (int) ($this->get('timestamp') / 1000);
     }
 
     /**
@@ -248,7 +248,11 @@ class Build extends AbstractItem
      */
     public function getDuration()
     {
-        return $this->get('duration') / 1000;
+        if ($this->get('duration') == 0) {
+            // duration is not set by Jenkins, let's calculate ourselves
+            return (int) (time() - $this->getTimestamp());
+        }
+        return (int) ($this->get('duration') / 1000);
     }
 
     /**
@@ -257,6 +261,14 @@ class Build extends AbstractItem
     public function getBuildUrl()
     {
         return $this->get('url');
+    }
+
+    /**
+     * @return string
+     */
+    public function getJobName()
+    {
+        return $this->_jobName;
     }
 
     /**
