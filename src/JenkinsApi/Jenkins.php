@@ -13,6 +13,7 @@ namespace JenkinsApi;
 
 use InvalidArgumentException;
 use JenkinsApi\Item\Build;
+use JenkinsApi\Item\LastBuild;
 use JenkinsApi\Item\Executor;
 use JenkinsApi\Item\Job;
 use JenkinsApi\Item\Node;
@@ -302,7 +303,7 @@ class Jenkins
      *
      * @return Job[]
      */
-    public function getCurrentlyBuildingJobs()
+    public function getCurrentlyBuildingJobs($xmlOutput = false)
     {
         $url = sprintf("%s", $this->_baseUrl)
             . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),%22_anime%22)]&wrapper=jobs";
@@ -320,12 +321,31 @@ class Jenkins
         }
         $xml = simplexml_load_string($ret);
         $builds = $xml->xpath('/jobs');
+        if ($xmlOutput === true) {
+            return $builds;
+        }
         $buildingJobs = [];
         foreach ($builds as $build) {
             $buildingJobs[] = new Job($build->job->name, $this);
         }
 
         return $buildingJobs;
+    }
+
+    /**
+     * Get the last builds from the currently building jobs
+     *
+     * @return LastBuild[]
+     */
+    public function getLastBuildsFromCurrentlyBuildingJobs()
+    {
+        $builds = $this->getCurrentlyBuildingJobs(true)[0];
+        $lastBuilds = [];
+        foreach ($builds->job as $job) {
+            $lastBuilds[] = new LastBuild($job->name, $this);
+        }
+
+        return $lastBuilds;
     }
 
     /**
