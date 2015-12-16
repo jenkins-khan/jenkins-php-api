@@ -13,9 +13,9 @@ namespace JenkinsApi;
 
 use InvalidArgumentException;
 use JenkinsApi\Item\Build;
-use JenkinsApi\Item\LastBuild;
 use JenkinsApi\Item\Executor;
 use JenkinsApi\Item\Job;
+use JenkinsApi\Item\LastBuild;
 use JenkinsApi\Item\Node;
 use JenkinsApi\Item\Queue;
 use JenkinsApi\Item\View;
@@ -31,6 +31,9 @@ use stdClass;
  */
 class Jenkins
 {
+    const FORMAT_OBJECT = 'asObject';
+    const FORMAT_XML = 'asXml';
+
     /**
      * @var bool
      */
@@ -181,9 +184,9 @@ class Jenkins
     }
 
     /**
-     * @param string $url
-     * @param array|string  $parameters
-     * @param array  $curlOpts
+     * @param string       $url
+     * @param array|string $parameters
+     * @param array        $curlOpts
      *
      * @throws RuntimeException
      * @return bool
@@ -197,10 +200,10 @@ class Jenkins
             curl_setopt_array($curl, $curlOpts);
         }
         curl_setopt($curl, CURLOPT_POST, 1);
-        if(is_array($parameters)) {
+        if (is_array($parameters)) {
             $parameters = http_build_query($parameters);
         }
-        curl_setopt($curl, CURLOPT_POSTFIELDS,$parameters);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
 
         $headers = (isset($curlOpts[CURLOPT_HTTPHEADER])) ? $curlOpts[CURLOPT_HTTPHEADER] : array();
 
@@ -299,9 +302,11 @@ class Jenkins
     /**
      * Get the currently building jobs
      *
-     * @return Job[]
+     * @param string $outputFormat One of the FORMAT_* constants
+     *
+     * @return Item\Job[]
      */
-    public function getCurrentlyBuildingJobs($xmlOutput = false)
+    public function getCurrentlyBuildingJobs($outputFormat = self::FORMAT_OBJECT)
     {
         $url = sprintf("%s", $this->_baseUrl)
             . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),%22_anime%22)]&wrapper=jobs";
@@ -317,17 +322,22 @@ class Jenkins
                 )
             );
         }
+
         $xml = simplexml_load_string($ret);
         $builds = $xml->xpath('/jobs');
-        if ($xmlOutput === true) {
-            return $builds;
-        }
-        $buildingJobs = [];
-        foreach ($builds as $build) {
-            $buildingJobs[] = new Job($build->job->name, $this);
-        }
 
-        return $buildingJobs;
+        switch ($outputFormat) {
+            case self::FORMAT_OBJECT:
+                $buildingJobs = [];
+                foreach ($builds as $build) {
+                    $buildingJobs[] = new Job($build->job->name, $this);
+                }
+                return $buildingJobs;
+            case self::FORMAT_XML:
+                return $builds;
+            default:
+                throw new InvalidArgumentException('Output format "' . $outputFormat . '" is unknown!');
+        }
     }
 
     /**
