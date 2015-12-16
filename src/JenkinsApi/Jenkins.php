@@ -124,9 +124,7 @@ class Jenkins
      */
     public function getQueue()
     {
-        $data = $this->get('queue/api/json');
-
-        return new Queue($data, $this);
+        return new Queue($this);
     }
 
     /**

@@ -15,11 +15,6 @@ use stdClass;
 class Queue extends AbstractItem
 {
     /**
-     * @var stdClass
-     */
-    private $_queue;
-
-    /**
      * @var Jenkins
      */
     protected $_jenkins;
