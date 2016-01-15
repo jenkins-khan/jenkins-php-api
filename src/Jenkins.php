@@ -262,7 +262,7 @@ class Jenkins
 
         curl_exec($curl);
 
-        $this->validateCurl($curl, sprintf('Error trying to launch job "%s" (%s)', $parameters['name'], $url));
+        $this->validateCurl($curl, sprintf('Error trying to launch job "%s" (%s)', $jobName, $url));
 
         return true;
     }
