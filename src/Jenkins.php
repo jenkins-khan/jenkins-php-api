@@ -102,9 +102,7 @@ class Jenkins
 
         $ret = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException('Error getting csrf crumb');
-        }
+        $this->validateCurl($curl, 'Error getting csrf crumb');
 
         $crumbResult = json_decode($ret);
 
@@ -158,9 +156,8 @@ class Jenkins
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error during getting list of jobs on %s', $this->baseUrl));
-        }
+        $this->validateCurl($curl, sprintf('Error during getting list of jobs on %s', $this->baseUrl));
+
         $this->jenkins = json_decode($ret);
         if (!$this->jenkins instanceof \stdClass) {
             throw new \RuntimeException('Error during json_decode');
@@ -218,13 +215,11 @@ class Jenkins
             curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
             $ret = curl_exec($curl);
 
-            if (curl_errno($curl)) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Error during getting information for executors[%s@%s] on %s', $i, $computer, $this->baseUrl
-                    )
-                );
-            }
+            $this->validateCurl(
+                $curl,
+                sprintf( 'Error during getting information for executors[%s@%s] on %s', $i, $computer, $this->baseUrl)
+            );
+
             $infos = json_decode($ret);
             if (!$infos instanceof \stdClass) {
                 throw new \RuntimeException('Error during json_decode');
@@ -237,10 +232,12 @@ class Jenkins
     }
 
     /**
-     * @param array $extraParameters
+     * @param       $jobName
+     * @param array $parameters
      *
      * @return bool
-     * @throws \RuntimeException
+     * @internal param array $extraParameters
+     *
      */
     public function launchJob($jobName, $parameters = array())
     {
@@ -265,9 +262,7 @@ class Jenkins
 
         curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error trying to launch job "%s" (%s)', $parameters['name'], $url));
-        }
+        $this->validateCurl($curl, sprintf('Error trying to launch job "%s" (%s)', $parameters['name'], $url));
 
         return true;
     }
@@ -275,6 +270,7 @@ class Jenkins
     /**
      * @param string $jobName
      *
+     * @return bool|\JenkinsKhan\Jenkins\Job
      * @throws \RuntimeException
      */
     public function getJob($jobName)
@@ -291,11 +287,11 @@ class Jenkins
             return false;
         }
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(
-                sprintf('Error during getting information for job %s on %s', $jobName, $this->baseUrl)
-            );
-        }
+        $this->validateCurl(
+            $curl,
+            sprintf('Error during getting information for job %s on %s', $jobName, $this->baseUrl)
+        );
+
         $infos = json_decode($ret);
         if (!$infos instanceof \stdClass) {
             throw new \RuntimeException('Error during json_decode');
@@ -327,9 +323,7 @@ class Jenkins
 
         $ret = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error deleting job %s on %s', $jobName, $this->baseUrl));
-        }
+        $this->validateCurl($curl, sprintf('Error deleting job %s on %s', $jobName, $this->baseUrl));
     }
 
     /**
@@ -344,9 +338,8 @@ class Jenkins
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error during getting information for queue on %s', $this->baseUrl));
-        }
+        $this->validateCurl($curl, sprintf('Error during getting information for queue on %s', $this->baseUrl));
+
         $infos = json_decode($ret);
         if (!$infos instanceof \stdClass) {
             throw new \RuntimeException('Error during json_decode');
@@ -400,11 +393,11 @@ class Jenkins
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(
-                sprintf('Error during getting information for view %s on %s', $viewName, $this->baseUrl)
-            );
-        }
+        $this->validateCurl(
+            $curl,
+            sprintf('Error during getting information for view %s on %s', $viewName, $this->baseUrl)
+        );
+
         $infos = json_decode($ret);
         if (!$infos instanceof \stdClass) {
             throw new \RuntimeException('Error during json_decode');
@@ -433,11 +426,11 @@ class Jenkins
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(
-                sprintf('Error during getting information for build %s#%d on %s', $job, $buildId, $this->baseUrl)
-            );
-        }
+        $this->validateCurl(
+            $curl,
+            sprintf('Error during getting information for build %s#%d on %s', $job, $buildId, $this->baseUrl)
+        );
+
         $infos = json_decode($ret);
 
         if (!$infos instanceof \stdClass) {
@@ -474,11 +467,11 @@ class Jenkins
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(
-                sprintf('Error during getting information for computer %s on %s', $computerName, $this->baseUrl)
-            );
-        }
+        $this->validateCurl(
+            $curl,
+            sprintf('Error during getting information for computer %s on %s', $computerName, $this->baseUrl)
+        );
+
         $infos = json_decode($ret);
 
         if (!$infos instanceof \stdClass) {
@@ -578,7 +571,9 @@ class Jenkins
 
     /**
      * @param string $jobname
-     * @param string $document
+     * @param        $configuration
+     *
+     * @internal param string $document
      */
     public function setJobConfig($jobname, $configuration)
     {
@@ -594,11 +589,9 @@ class Jenkins
         }
 
         curl_setopt($curl, \CURLOPT_HTTPHEADER, $headers);
-
         curl_exec($curl);
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error during setting configuration for job %s', $jobname));
-        }
+
+        $this->validateCurl($curl, sprintf('Error during setting configuration for job %s', $jobname));
     }
 
     /**
@@ -612,9 +605,8 @@ class Jenkins
         $curl = curl_init($url);
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error during getting configuation for job %s', $jobname));
-        }
+
+        $this->validateCurl($curl, sprintf('Error during getting configuration for job %s', $jobname));
 
         return $ret;
     }
@@ -640,11 +632,12 @@ class Jenkins
         }
 
         curl_setopt($curl, \CURLOPT_HTTPHEADER, $headers);
-
         curl_exec($curl);
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error durring stopping executor #%s', $executor->getNumber()));
-        }
+
+        $this->validateCurl(
+            $curl,
+            sprintf('Error during stopping executor #%s', $executor->getNumber())
+        );
     }
 
     /**
@@ -667,11 +660,13 @@ class Jenkins
         }
 
         curl_setopt($curl, \CURLOPT_HTTPHEADER, $headers);
-
         curl_exec($curl);
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error durring stopping job queue #%s', $queue->getId()));
-        }
+
+        $this->validateCurl(
+            $curl,
+            sprintf('Error during stopping job queue #%s', $queue->getId())
+        );
+
     }
 
     /**
@@ -693,11 +688,9 @@ class Jenkins
         }
 
         curl_setopt($curl, \CURLOPT_HTTPHEADER, $headers);
-
         curl_exec($curl);
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error marking %s offline', $computerName));
-        }
+
+        $this->validateCurl($curl, sprintf('Error marking %s offline', $computerName));
     }
 
     /**
@@ -719,11 +712,9 @@ class Jenkins
         }
 
         curl_setopt($curl, \CURLOPT_HTTPHEADER, $headers);
-
         curl_exec($curl);
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error deleting %s', $computerName));
-        }
+
+        $this->validateCurl($curl, sprintf('Error deleting %s', $computerName));
     }
 
     /**
@@ -743,9 +734,11 @@ class Jenkins
 
     /**
      * @param string $jobName
-     * @param string $buildNumber
+     * @param        $buildId
      *
      * @return array
+     * @internal param string $buildNumber
+     *
      */
     public function getTestReport($jobName, $buildId)
     {
@@ -762,6 +755,11 @@ class Jenkins
         if (curl_errno($curl)) {
             throw new \RuntimeException($errorMessage);
         }
+        $this->validateCurl(
+            $curl,
+            $errorMessage
+        );
+
         $infos = json_decode($ret);
 
         if (!$infos instanceof \stdClass) {
@@ -773,7 +771,7 @@ class Jenkins
 
     /**
      * Returns the content of a page according to the jenkins base url.
-     * Usefull if you use jenkins plugins that provides specific APIs.
+     * Useful if you use jenkins plugins that provides specific APIs.
      * (e.g. "/cloud/ec2-us-east-1/provision")
      *
      * @param string $uri
@@ -788,9 +786,7 @@ class Jenkins
         curl_setopt_array($curl, $curlOptions);
         $ret = curl_exec($curl);
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException(sprintf('Error calling "%s"', $url));
-        }
+        $this->validateCurl($curl, sprintf('Error calling "%s"', $url));
 
         return $ret;
     }
@@ -825,5 +821,23 @@ class Jenkins
     public function getComputerConfiguration($computerName)
     {
         return $this->execute(sprintf('/computer/%s/config.xml', $computerName), array(\CURLOPT_RETURNTRANSFER => 1,));
+    }
+
+    /**
+     * Validate curl_error() and http_code in a cURL request
+     *
+     * @param $curl
+     * @param $errorMessage
+     */
+    private function validateCurl($curl, $errorMessage) {
+
+        if (curl_errno($curl)) {
+            throw new \RuntimeException($errorMessage);
+        }
+        $info = curl_getinfo($curl);
+
+        if ($info['http_code'] === 403) {
+            throw new \RuntimeException(sprintf('Access Denied [HTTP status code 403] to %s"', $info['url']));
+        }
     }
 }
