@@ -752,9 +752,6 @@ class Jenkins
             'Error during getting information for build %s#%d on %s', $jobName, $buildId, $this->baseUrl
         );
 
-        if (curl_errno($curl)) {
-            throw new \RuntimeException($errorMessage);
-        }
         $this->validateCurl(
             $curl,
             $errorMessage
