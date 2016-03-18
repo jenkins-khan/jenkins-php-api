@@ -47,6 +47,16 @@ class Jenkins
     /**
      * @var string
      */
+    private $_username;
+
+    /**
+     * @var string
+     */
+    private $_password;
+
+    /**
+     * @var string
+     */
     private $_urlExtension = '/api/json';
 
     /**
@@ -80,9 +90,11 @@ class Jenkins
     /**
      * @param string $baseUrl
      */
-    public function __construct($baseUrl)
+    public function __construct($baseUrl, $username='', $password='')
     {
-        $this->_baseUrl = $baseUrl . ((substr($baseUrl, -1) === '/') ? '' : '/');
+        $this->_baseUrl  = $baseUrl . ((substr($baseUrl, -1) === '/') ? '' : '/');
+        $this->_username = $username;
+        $this->_password = $password;
     }
 
     /**
@@ -155,6 +167,11 @@ class Jenkins
         }
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        if ($this->_username) {
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+        }
+
         $ret = curl_exec($curl);
 
         $response_info = curl_getinfo($curl);
@@ -205,6 +222,10 @@ class Jenkins
         }
         curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
 
+        if ($this->_username) {
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+        }
+
         $headers = (isset($curlOpts[CURLOPT_HTTPHEADER])) ? $curlOpts[CURLOPT_HTTPHEADER] : array();
 
         if ($this->areCrumbsEnabled()) {
@@ -225,6 +246,11 @@ class Jenkins
     {
         $curl = curl_init($this->_baseUrl . '/api/json');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        if ($this->_username) {
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+        }
+
         curl_exec($curl);
 
         if (curl_errno($curl)) {
@@ -262,6 +288,10 @@ class Jenkins
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        if ($this->_username) {
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+        }
 
         $ret = curl_exec($curl);
 
@@ -313,6 +343,11 @@ class Jenkins
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        if ($this->_username) {
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+        }
+
         $ret = curl_exec($curl);
 
         if (curl_errno($curl)) {
@@ -399,6 +434,10 @@ class Jenkins
 
         curl_setopt($curl, CURLOPT_POSTFIELDS, $xmlConfiguration);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        if ($this->_username) {
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+        }
 
         $headers = array('Content-Type: text/xml');
 
