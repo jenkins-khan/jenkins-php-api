@@ -43,7 +43,7 @@ Will launch the job and return imidiatly
 
 Will launch the job and wait until the job is finished
 ```php
-    $job = $jenkins->getJob("clone-deploy")->launch();
+    $job = $jenkins->getJob("clone-deploy")->launchAndWait();
 ```
 
 
