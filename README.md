@@ -52,6 +52,8 @@ Launch a Job
 
 ```php
     $job = $jenkins->launchJob("clone-deploy");
+    var_dump($job);
+    // bool(true) if successful or throws a RuntimeException
 ```
 
 
