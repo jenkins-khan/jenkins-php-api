@@ -37,6 +37,22 @@ class View
     }
 
     /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return (isset($this->view->description)) ? $this->view->description : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getURL()
+    {
+        return (isset($this->view->url)) ? $this->view->url : null;
+    }
+
+    /**
      * @return Job[]
      */
     public function getJobs()
