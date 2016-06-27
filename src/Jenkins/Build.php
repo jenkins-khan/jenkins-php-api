@@ -65,13 +65,20 @@ class Build
     {
         $parameters = array();
 
-        if (!property_exists($this->build->actions[0], 'parameters')) {
-            return $parameters;
-        }
+		// Parameters may not always be the first definition. Search for 'hudson.model.ParametersAction' to find
+		// real parameters.
+		foreach ($this->build->actions as $action) {
+			if (isset($action->_class) && $action->_class === 'hudson.model.ParametersAction') {
+				if (!property_exists($action, 'parameters')) {
+					return $parameters;
+				}
 
-        foreach ($this->build->actions[0]->parameters as $parameter) {
-            $parameters[$parameter->name] = $parameter->value;
-        }
+				foreach ($action->parameters as $parameter) {
+					$parameters[$parameter->name] = $parameter->value;
+				}
+				return $parameters;
+			}
+		}
 
         return $parameters;
     }
