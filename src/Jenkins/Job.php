@@ -161,7 +161,7 @@ class Job
      */
     public function getLastBuild()
     {
-        if(null === $this->job->lastBuild) {
+        if (null === $this->job->lastBuild) {
             return null;
         }
 
