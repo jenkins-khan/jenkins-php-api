@@ -1,9 +1,4 @@
 {
-    "description": "Library to control Jenkins via PHP through JSON api",
-    "require": {
-        "ext-curl": "*",
-        "php": ">=5.4.0"
-    },
     "autoload": {
         "psr-0": {
             "JenkinsApi": "src/"
