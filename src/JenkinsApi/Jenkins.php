@@ -462,12 +462,15 @@ class Jenkins
      */
     public function getNodes()
     {
-        $data = json_decode($this->get('computer/api/json'));
-        $nodes = array();
+        $data = $this->get('computer/api/json');
+
         foreach ($data->computer as $node) {
-            $nodes[] = new Node($node->displayName, $this);
+            if ($node->displayName == 'master') {
+                yield new Node('(master)', $this);
+            } else {
+                yield new Node($node->displayName, $this);
+            }
         }
-        return $nodes;
     }
 
     /**
@@ -475,12 +478,9 @@ class Jenkins
      */
     public function getExecutors()
     {
-        $executors = array();
         foreach ($this->getNodes() as $node) {
-            $executors = array_merge($executors, $node->getExecutors());
+            yield $node->getExecutors();
         }
-
-        return $executors;
     }
 
     /**

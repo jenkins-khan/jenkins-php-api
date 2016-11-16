@@ -47,11 +47,9 @@ class Node extends AbstractItem
      */
     public function getExecutors()
     {
-        $executors = [];
         for ($i = 0; $i < $this->get('numExecutors'); $i++) {
-            $executors[] = new Executor($i, $this->_nodeName, $this->getJenkins());
+            yield new Executor($i, $this->_nodeName, $this->getJenkins());
         }
-        return $executors;
     }
 
     /**
