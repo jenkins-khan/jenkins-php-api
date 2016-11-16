@@ -1,4 +1,5 @@
 {
+	"name": "productsupcom/jenkins-php-api",
     "autoload": {
         "psr-0": {
             "JenkinsApi": "src/"
