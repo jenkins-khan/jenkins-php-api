@@ -1,12 +1,12 @@
 {
     "name": "productsupcom/jenkins-php-api",
     "description": "Library to control Jenkins via PHP through JSON api",
-    "minimum-stability": "dev",
-    "homepage": "https://github.com/chbiel/jenkins-php-api",
+    "homepage": "https://github.com/productsupcom/jenkins-php-api",
     "license": "proprietary",
     "authors": [
         {
-            "name": "Christopher Biel", "email": "christopher.biel89@gmail.com"
+            "name": "Christopher Biel", "email": "christopher.biel89@gmail.com",
+            "name": "Werner Spiegel", "email": "ws@productsup.com"
         }
     ],
     "require": {
