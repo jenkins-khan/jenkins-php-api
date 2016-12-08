@@ -34,7 +34,6 @@ class Jenkins
 {
     const FORMAT_OBJECT = 'asObject';
     const FORMAT_XML = 'asXml';
-    const FORMAT_JSON = 'json';
 
     /**
      * @var bool
@@ -341,9 +340,8 @@ class Jenkins
     public function getCurrentlyBuildingJobs($outputFormat = self::FORMAT_OBJECT)
     {
         $url = sprintf(
-            '%s/api/%s?%s',
+            '%s/api/xml?%s',
             $this->_baseUrl,
-            $outputFormat === self::FORMAT_JSON ? 'json' : 'xml',
             'tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),%22_anime%22)]&wrapper=jobs'
         );
 
@@ -365,18 +363,14 @@ class Jenkins
             );
         }
 
-        if ($outputFormat === self::FORMAT_JSON) {
-            return $ret;
-        }
-
         $xml = simplexml_load_string($ret);
-        $builds = $xml->xpath('/jobs');
+        $builds = $xml->xpath('/jobs/job');
 
         switch ($outputFormat) {
             case self::FORMAT_OBJECT:
                 $buildingJobs = [];
                 foreach ($builds as $build) {
-                    $buildingJobs[] = new Job($build->job->name, $this);
+                    $buildingJobs[] = new Job($build->name, $this);
                 }
                 return $buildingJobs;
             case self::FORMAT_XML:
