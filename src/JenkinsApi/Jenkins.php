@@ -364,17 +364,17 @@ class Jenkins
         }
 
         $xml = simplexml_load_string($ret);
-        $builds = $xml->xpath('/jobs/job');
+        $jobs = $xml->xpath('/jobs/job');
 
         switch ($outputFormat) {
             case self::FORMAT_OBJECT:
                 $buildingJobs = [];
-                foreach ($builds as $build) {
-                    $buildingJobs[] = new Job($build->name, $this);
+                foreach ($jobs as $job) {
+                    $buildingJobs[] = new Job($job->name, $this);
                 }
                 return $buildingJobs;
             case self::FORMAT_XML:
-                return $builds;
+                return $jobs;
             default:
                 throw new InvalidArgumentException('Output format "' . $outputFormat . '" is unknown!');
         }
