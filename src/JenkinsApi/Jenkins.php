@@ -12,6 +12,7 @@
 namespace JenkinsApi;
 
 use InvalidArgumentException;
+use JenkinsApi\Exceptions\JenkinsApiException;
 use JenkinsApi\Item\Build;
 use JenkinsApi\Item\Executor;
 use JenkinsApi\Item\Job;
@@ -33,6 +34,7 @@ class Jenkins
 {
     const FORMAT_OBJECT = 'asObject';
     const FORMAT_XML = 'asXml';
+    const FORMAT_JSON = 'json';
 
     /**
      * @var bool
@@ -90,9 +92,9 @@ class Jenkins
     /**
      * @param string $baseUrl
      */
-    public function __construct($baseUrl, $username='', $password='')
+    public function __construct($baseUrl, $username = '', $password = '')
     {
-        $this->_baseUrl  = $baseUrl . ((substr($baseUrl, -1) === '/') ? '' : '/');
+        $this->_baseUrl = $baseUrl . ((substr($baseUrl, -1) === '/') ? '' : '/');
         $this->_username = $username;
         $this->_password = $password;
     }
@@ -169,7 +171,7 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $ret = curl_exec($curl);
@@ -177,7 +179,7 @@ class Jenkins
         $response_info = curl_getinfo($curl);
 
         if (200 != $response_info['http_code']) {
-            throw new RuntimeException(
+            throw new JenkinsApiException(
                 sprintf(
                     'Error during getting information from url %s (Response: %s)', $url, $response_info['http_code']
                 )
@@ -185,7 +187,7 @@ class Jenkins
         }
 
         if (curl_errno($curl)) {
-            throw new RuntimeException(
+            throw new JenkinsApiException(
                 sprintf('Error during getting information from url %s (%s)', $url, curl_error($curl))
             );
         }
@@ -194,7 +196,7 @@ class Jenkins
         }
         $data = json_decode($ret);
         if (!$data instanceof stdClass) {
-            throw new RuntimeException('Error during json_decode');
+            throw new JenkinsApiException('Error during json_decode');
         }
 
         return $data;
@@ -223,7 +225,7 @@ class Jenkins
         curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $headers = (isset($curlOpts[CURLOPT_HTTPHEADER])) ? $curlOpts[CURLOPT_HTTPHEADER] : array();
@@ -248,7 +250,7 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         curl_exec($curl);
@@ -258,7 +260,7 @@ class Jenkins
         } else {
             try {
                 $this->getQueue();
-            } catch (RuntimeException $e) {
+            } catch (JenkinsApiException $e) {
                 return false;
             }
         }
@@ -290,19 +292,19 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $ret = curl_exec($curl);
 
         if (curl_errno($curl)) {
-            throw new RuntimeException('Error getting csrf crumb');
+            throw new JenkinsApiException('Error getting csrf crumb');
         }
 
         $crumbResult = json_decode($ret);
 
         if (!$crumbResult instanceof stdClass) {
-            throw new RuntimeException('Error during json_decode of csrf crumb');
+            throw new JenkinsApiException('Error during json_decode of csrf crumb');
         }
 
         return $crumbResult;
@@ -338,24 +340,33 @@ class Jenkins
      */
     public function getCurrentlyBuildingJobs($outputFormat = self::FORMAT_OBJECT)
     {
-        $url = sprintf("%s", $this->_baseUrl)
-            . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),%22_anime%22)]&wrapper=jobs";
+        $url = sprintf(
+            '%s/api/%s?%s',
+            $this->_baseUrl,
+            $outputFormat === self::FORMAT_JSON ? 'json' : 'xml',
+            'tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),%22_anime%22)]&wrapper=jobs'
+        );
+
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $ret = curl_exec($curl);
 
         if (curl_errno($curl)) {
-            throw new RuntimeException(
+            throw new JenkinsApiException(
                 sprintf(
                     'Error during getting all currently building jobs on %s (%s)', $this->_baseUrl, curl_error($curl)
                 )
             );
+        }
+
+        if ($outputFormat === self::FORMAT_JSON) {
+            return $ret;
         }
 
         $xml = simplexml_load_string($ret);
@@ -436,7 +447,7 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $headers = array('Content-Type: text/xml');
@@ -453,7 +464,7 @@ class Jenkins
             throw new InvalidArgumentException(sprintf('Job %s already exists', $jobname));
         }
         if (curl_errno($curl)) {
-            throw new RuntimeException(sprintf('Error creating job %s (%s)', $jobname, curl_error($curl)));
+            throw new JenkinsApiException(sprintf('Error creating job %s (%s)', $jobname, curl_error($curl)));
         }
     }
 
@@ -465,11 +476,7 @@ class Jenkins
         $data = $this->get('computer/api/json');
 
         foreach ($data->computer as $node) {
-            if ($node->displayName == 'master') {
-                yield new Node('(master)', $this);
-            } else {
-                yield new Node($node->displayName, $this);
-            }
+            yield new Node($node->displayName, $this);
         }
     }
 

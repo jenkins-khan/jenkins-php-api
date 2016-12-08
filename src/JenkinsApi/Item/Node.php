@@ -2,6 +2,8 @@
 namespace JenkinsApi\Item;
 
 use JenkinsApi\AbstractItem;
+use JenkinsApi\Exceptions\JenkinsApiException;
+use JenkinsApi\Exceptions\NodeNotFoundException;
 use JenkinsApi\Jenkins;
 use RuntimeException;
 use stdClass;
@@ -28,10 +30,23 @@ class Node extends AbstractItem
      */
     public function __construct($nodeName, Jenkins $jenkins)
     {
+        if ($nodeName === 'master') {
+            $nodeName = '(master)';
+        }
+
         $this->_nodeName = $nodeName;
         $this->_jenkins = $jenkins;
 
         $this->refresh();
+    }
+
+    public function refresh()
+    {
+        try {
+            return parent::refresh();
+        } catch (JenkinsApiException $e) {
+            throw new NodeNotFoundException($this->_nodeName, 0, $e);
+        }
     }
 
     /**
@@ -58,7 +73,7 @@ class Node extends AbstractItem
     public function toggleOffline()
     {
         $response = $this->getJenkins()->post(sprintf('computer/%s/toggleOffline', $this->_nodeName));
-        if($response) {
+        if ($response) {
             throw new RuntimeException(sprintf('Error marking %s offline', $this->_nodeName));
         }
         return $this;
@@ -96,6 +111,6 @@ class Node extends AbstractItem
      */
     public function isOffline()
     {
-        return (bool)$this->get('offline');
+        return (bool) $this->get('offline');
     }
 }

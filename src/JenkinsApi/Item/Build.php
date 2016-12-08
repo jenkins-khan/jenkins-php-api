@@ -2,6 +2,8 @@
 namespace JenkinsApi\Item;
 
 use JenkinsApi\AbstractItem;
+use JenkinsApi\Exceptions\BuildNotFoundException;
+use JenkinsApi\Exceptions\JenkinsApiException;
 use JenkinsApi\Jenkins;
 
 /**
@@ -68,6 +70,15 @@ class Build extends AbstractItem
         $this->_jenkins = $jenkins;
 
         $this->refresh();
+    }
+
+    public function refresh()
+    {
+        try {
+            return parent::refresh();
+        } catch (JenkinsApiException $e) {
+            throw new BuildNotFoundException($this->_buildNumber, $this->_jobName, 0, $e);
+        }
     }
 
     /**
@@ -138,7 +149,6 @@ class Build extends AbstractItem
         }
         return $duration;
     }
-
 
     /**
      * Returns remaining execution time (seconds)
@@ -232,7 +242,7 @@ class Build extends AbstractItem
      */
     public function isBuilding()
     {
-        return (bool)$this->get('building');
+        return (bool) $this->get('building');
     }
 
     /**
