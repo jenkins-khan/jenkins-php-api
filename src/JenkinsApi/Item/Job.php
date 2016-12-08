@@ -119,7 +119,11 @@ class Job extends AbstractItem
      */
     public function isCurrentlyBuilding()
     {
-        return $this->getLastBuild()->isBuilding();
+        $lastBuild = $this->getLastBuild();
+        if ($lastBuild === null) {
+            return false;
+        }
+        return $lastBuild->isBuilding();
     }
 
     /**
