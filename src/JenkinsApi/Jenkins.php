@@ -387,10 +387,10 @@ class Jenkins
      */
     public function getLastBuildsFromCurrentlyBuildingJobs()
     {
-        $builds = $this->getCurrentlyBuildingJobs(true)[0];
+        $jobs = $this->getCurrentlyBuildingJobs();
         $lastBuilds = [];
-        foreach ($builds->job as $job) {
-            $lastBuilds[] = new LastBuild($job->name, $this);
+        foreach ($jobs as $job) {
+            $lastBuilds[] = $job->getLastBuild();
         }
 
         return $lastBuilds;
