@@ -364,12 +364,12 @@ class Jenkins
         }
 
         $xml = simplexml_load_string($ret);
-        $jobs = $xml->xpath('/jobs/job');
+        $jobs = $xml->xpath('/jobs');
 
         switch ($outputFormat) {
             case self::FORMAT_OBJECT:
                 $buildingJobs = [];
-                foreach ($jobs as $job) {
+                foreach ($jobs[0]->job as $job) {
                     $buildingJobs[] = new Job($job->name, $this);
                 }
                 return $buildingJobs;
