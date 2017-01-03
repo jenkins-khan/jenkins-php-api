@@ -12,6 +12,7 @@
 namespace JenkinsApi;
 
 use InvalidArgumentException;
+use JenkinsApi\Exceptions\JenkinsApiException;
 use JenkinsApi\Item\Build;
 use JenkinsApi\Item\Executor;
 use JenkinsApi\Item\Job;
@@ -90,9 +91,9 @@ class Jenkins
     /**
      * @param string $baseUrl
      */
-    public function __construct($baseUrl, $username='', $password='')
+    public function __construct($baseUrl, $username = '', $password = '')
     {
-        $this->_baseUrl  = $baseUrl . ((substr($baseUrl, -1) === '/') ? '' : '/');
+        $this->_baseUrl = $baseUrl . ((substr($baseUrl, -1) === '/') ? '' : '/');
         $this->_username = $username;
         $this->_password = $password;
     }
@@ -169,7 +170,7 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $ret = curl_exec($curl);
@@ -177,7 +178,7 @@ class Jenkins
         $response_info = curl_getinfo($curl);
 
         if (200 != $response_info['http_code']) {
-            throw new RuntimeException(
+            throw new JenkinsApiException(
                 sprintf(
                     'Error during getting information from url %s (Response: %s)', $url, $response_info['http_code']
                 )
@@ -185,7 +186,7 @@ class Jenkins
         }
 
         if (curl_errno($curl)) {
-            throw new RuntimeException(
+            throw new JenkinsApiException(
                 sprintf('Error during getting information from url %s (%s)', $url, curl_error($curl))
             );
         }
@@ -194,7 +195,7 @@ class Jenkins
         }
         $data = json_decode($ret);
         if (!$data instanceof stdClass) {
-            throw new RuntimeException('Error during json_decode');
+            throw new JenkinsApiException('Error during json_decode');
         }
 
         return $data;
@@ -223,7 +224,7 @@ class Jenkins
         curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $headers = (isset($curlOpts[CURLOPT_HTTPHEADER])) ? $curlOpts[CURLOPT_HTTPHEADER] : array();
@@ -248,7 +249,7 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         curl_exec($curl);
@@ -258,7 +259,7 @@ class Jenkins
         } else {
             try {
                 $this->getQueue();
-            } catch (RuntimeException $e) {
+            } catch (JenkinsApiException $e) {
                 return false;
             }
         }
@@ -290,19 +291,19 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $ret = curl_exec($curl);
 
         if (curl_errno($curl)) {
-            throw new RuntimeException('Error getting csrf crumb');
+            throw new JenkinsApiException('Error getting csrf crumb');
         }
 
         $crumbResult = json_decode($ret);
 
         if (!$crumbResult instanceof stdClass) {
-            throw new RuntimeException('Error during json_decode of csrf crumb');
+            throw new JenkinsApiException('Error during json_decode of csrf crumb');
         }
 
         return $crumbResult;
@@ -338,20 +339,24 @@ class Jenkins
      */
     public function getCurrentlyBuildingJobs($outputFormat = self::FORMAT_OBJECT)
     {
-        $url = sprintf("%s", $this->_baseUrl)
-            . "/api/xml?tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),%22_anime%22)]&wrapper=jobs";
+        $url = sprintf(
+            '%s/api/xml?%s',
+            $this->_baseUrl,
+            'tree=jobs[name,url,color]&xpath=/hudson/job[ends-with(color/text(),%22_anime%22)]&wrapper=jobs'
+        );
+
         $curl = curl_init($url);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $ret = curl_exec($curl);
 
         if (curl_errno($curl)) {
-            throw new RuntimeException(
+            throw new JenkinsApiException(
                 sprintf(
                     'Error during getting all currently building jobs on %s (%s)', $this->_baseUrl, curl_error($curl)
                 )
@@ -359,17 +364,17 @@ class Jenkins
         }
 
         $xml = simplexml_load_string($ret);
-        $builds = $xml->xpath('/jobs');
+        $jobs = $xml->xpath('/jobs/job');
 
         switch ($outputFormat) {
             case self::FORMAT_OBJECT:
                 $buildingJobs = [];
-                foreach ($builds as $build) {
-                    $buildingJobs[] = new Job($build->job->name, $this);
+                foreach ($jobs as $job) {
+                    $buildingJobs[] = new Job($job->name, $this);
                 }
                 return $buildingJobs;
             case self::FORMAT_XML:
-                return $builds;
+                return $jobs;
             default:
                 throw new InvalidArgumentException('Output format "' . $outputFormat . '" is unknown!');
         }
@@ -382,10 +387,10 @@ class Jenkins
      */
     public function getLastBuildsFromCurrentlyBuildingJobs()
     {
-        $builds = $this->getCurrentlyBuildingJobs(true)[0];
+        $jobs = $this->getCurrentlyBuildingJobs();
         $lastBuilds = [];
-        foreach ($builds->job as $job) {
-            $lastBuilds[] = new LastBuild($job->name, $this);
+        foreach ($jobs as $job) {
+            $lastBuilds[] = $job->getLastBuild();
         }
 
         return $lastBuilds;
@@ -436,7 +441,7 @@ class Jenkins
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->_username) {
-            curl_setopt($curl, CURLOPT_USERPWD, $this->_username.":".$this->_password);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->_username . ":" . $this->_password);
         }
 
         $headers = array('Content-Type: text/xml');
@@ -453,7 +458,7 @@ class Jenkins
             throw new InvalidArgumentException(sprintf('Job %s already exists', $jobname));
         }
         if (curl_errno($curl)) {
-            throw new RuntimeException(sprintf('Error creating job %s (%s)', $jobname, curl_error($curl)));
+            throw new JenkinsApiException(sprintf('Error creating job %s (%s)', $jobname, curl_error($curl)));
         }
     }
 
@@ -462,12 +467,11 @@ class Jenkins
      */
     public function getNodes()
     {
-        $data = json_decode($this->get('computer/api/json'));
-        $nodes = array();
+        $data = $this->get('computer/api/json');
+
         foreach ($data->computer as $node) {
-            $nodes[] = new Node($node->displayName, $this);
+            yield new Node($node->displayName, $this);
         }
-        return $nodes;
     }
 
     /**
@@ -475,12 +479,9 @@ class Jenkins
      */
     public function getExecutors()
     {
-        $executors = array();
         foreach ($this->getNodes() as $node) {
-            $executors = array_merge($executors, $node->getExecutors());
+            yield $node->getExecutors();
         }
-
-        return $executors;
     }
 
     /**

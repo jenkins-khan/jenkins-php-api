@@ -1,3 +1,7 @@
-vendor
+vendor/
 composer.phar
+composer.lock
+composer.local.json
+composer.local.lock
 .idea
+tests/

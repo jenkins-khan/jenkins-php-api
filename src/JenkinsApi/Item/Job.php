@@ -3,12 +3,12 @@ namespace JenkinsApi\Item;
 
 use DOMDocument;
 use JenkinsApi\AbstractItem;
+use JenkinsApi\Exceptions\JenkinsApiException;
+use JenkinsApi\Exceptions\JobNotFoundException;
 use JenkinsApi\Jenkins;
 use RuntimeException;
 
 /**
- *
- *
  * @package    JenkinsApi\Item
  * @author     Christopher Biel <christopher.biel@jungheinrich.de>
  * @version    $Id$
@@ -33,6 +33,15 @@ class Job extends AbstractItem
         $this->_jenkins = $jenkins;
 
         $this->refresh();
+    }
+
+    public function refresh()
+    {
+        try {
+            return parent::refresh();
+        } catch (JenkinsApiException $e) {
+            throw new JobNotFoundException($this->_jobName, 0, $e);
+        }
     }
 
     /**
@@ -84,7 +93,7 @@ class Job extends AbstractItem
                 $description = property_exists($parameterDefinition, 'description') ? $parameterDefinition->description : null;
                 $choices = property_exists($parameterDefinition, 'choices') ? $parameterDefinition->choices : null;
 
-                $parameters[$parameterDefinition->name] = array('default' => $default, 'choices' => $choices, 'description' => $description,);
+                $parameters[$parameterDefinition->name] = array('default' => $default, 'choices' => $choices, 'description' => $description);
             }
         }
 
@@ -119,7 +128,11 @@ class Job extends AbstractItem
      */
     public function isCurrentlyBuilding()
     {
-        return $this->getLastBuild()->isBuilding();
+        $lastBuild = $this->getLastBuild();
+        if ($lastBuild === null) {
+            return false;
+        }
+        return $lastBuild->isBuilding();
     }
 
     /**
@@ -150,7 +163,7 @@ class Job extends AbstractItem
             $startTime = time();
             $response = $this->launch($parameters);
             // TODO evaluate the response correctly, to get the queued item and later the build
-            if($response) {
+            if ($response) {
 //                list($header, $body) = explode("\r\n\r\n", $response, 2);
             }
 
