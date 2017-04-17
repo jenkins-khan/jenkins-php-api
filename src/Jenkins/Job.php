@@ -167,4 +167,12 @@ class Job
 
         return $this->getJenkins()->getBuild($this->getName(), $this->job->lastBuild->number);
     }
+
+    /**
+     * @return integer
+     */
+    public function getNextBuildNumber()
+    {
+        return $this->job->nextBuildNumber;
+    }
 }
