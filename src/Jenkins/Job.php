@@ -75,6 +75,7 @@ class Job
 
             foreach ($action->parameterDefinitions as $parameterDefinition) {
                 $default     = property_exists($parameterDefinition, 'defaultParameterValue')
+                               && isset($parameterDefinition->defaultParameterValue->value)
                     ? $parameterDefinition->defaultParameterValue->value
                     : null;
                 $description = property_exists($parameterDefinition, 'description')
