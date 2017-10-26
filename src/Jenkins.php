@@ -733,12 +733,11 @@ class Jenkins
     }
 
     /**
-     * @param string $jobName
-     * @param        $buildId
+     * Retrieve test report of given job name and build number.
      *
-     * @return array
-     * @internal param string $buildNumber
-     *
+     * @param string $jobName Name of the job
+     * @param int|string $buildId Build number
+     * @return Jenkins\TestReport
      */
     public function getTestReport($jobName, $buildId)
     {
