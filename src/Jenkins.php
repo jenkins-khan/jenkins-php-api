@@ -241,10 +241,15 @@ class Jenkins
      */
     public function launchJob($jobName, $parameters = array())
     {
-        if (0 === count($parameters)) {
-            $url = sprintf('%s/job/%s/build', $this->baseUrl, $jobName);
-        } else {
-            $url = sprintf('%s/job/%s/buildWithParameters', $this->baseUrl, $jobName);
+        $url = sprintf('%s/job/%s/build', $this->baseUrl, $jobName);
+
+        if ($parameters) {
+            $parameters = array(
+                'json' => json_encode(array(
+                        "parameter" => $parameters
+                    )
+                )
+            );
         }
 
         $curl = curl_init($url);
@@ -259,7 +264,6 @@ class Jenkins
         }
 
         curl_setopt($curl, \CURLOPT_HTTPHEADER, $headers);
-
         curl_exec($curl);
 
         $this->validateCurl($curl, sprintf('Error trying to launch job "%s" (%s)', $jobName, $url));
