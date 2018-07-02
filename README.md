@@ -61,8 +61,9 @@ Launch a Job with Parameters
 
 ```php
     $job = $jenkins->launchJob("clone-deploy",array(
-        'name'=> <param_name>, 'value'=> <param_value>
-        'name'=> <param2_name>, 'value'=> <param2_value>
+            'name'=> <param_name>, 'value'=> <param_value>
+            'name'=> <param2_name>, 'value'=> <param2_value>
+        )
     );
     var_dump($job);
     // bool(true) if successful or throws a RuntimeException
