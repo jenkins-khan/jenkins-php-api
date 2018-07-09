@@ -275,6 +275,8 @@ class Jenkins
      */
     public function getJob($jobName)
     {
+        // Encode the job name, otherwise Jenkins won't match spaces.
+        $jobName = rawurlencode($jobName);
         $url  = sprintf('%s/job/%s/api/json', $this->baseUrl, $jobName);
         $curl = curl_init($url);
 
