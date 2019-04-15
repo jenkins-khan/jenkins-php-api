@@ -172,6 +172,9 @@ class Build
     public function getResult()
     {
         $result = null;
+        if ($this->isBuilding()) {
+            return Build::RUNNING;
+        }
         switch ($this->build->result) {
             case 'FAILURE':
                 $result = Build::FAILURE;
