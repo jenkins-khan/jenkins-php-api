@@ -159,6 +159,14 @@ class Build
     }
 
     /**
+     * @return boolean
+     */
+    public function isBuilding()
+    {
+        return $this->build->building;
+    }
+
+    /**
      * @return null|string
      */
     public function getResult()
