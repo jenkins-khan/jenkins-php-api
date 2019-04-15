@@ -159,11 +159,22 @@ class Build
     }
 
     /**
+     * @return boolean
+     */
+    public function isBuilding()
+    {
+        return $this->build->building;
+    }
+
+    /**
      * @return null|string
      */
     public function getResult()
     {
         $result = null;
+        if ($this->isBuilding()) {
+            return Build::RUNNING;
+        }
         switch ($this->build->result) {
             case 'FAILURE':
                 $result = Build::FAILURE;

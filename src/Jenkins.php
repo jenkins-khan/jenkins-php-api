@@ -415,7 +415,7 @@ class Jenkins
      * @return Jenkins\Build
      * @throws \RuntimeException
      */
-    public function getBuild($job, $buildId, $tree = 'actions[parameters,parameters[name,value]],result,duration,timestamp,number,url,estimatedDuration,builtOn')
+    public function getBuild($job, $buildId, $tree = 'actions[parameters,parameters[name,value]],result,duration,timestamp,number,url,estimatedDuration,builtOn,building')
     {
         if ($tree !== null) {
             $tree = sprintf('?tree=%s', $tree);
