@@ -41,6 +41,16 @@ class Job
         return $builds;
     }
 
+	/**
+	 * @return array
+	 */
+	public function getSubJobs()
+	{
+		if (!isset($this->job->jobs)) {
+			return [];
+		}
+		return $this->job->jobs;
+	}
 
     /**
      * @param int $buildId
