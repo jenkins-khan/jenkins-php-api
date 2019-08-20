@@ -58,7 +58,7 @@ class Job
      */
     public function getName()
     {
-        return $this->job->name;
+        return $this->job->fullName;
     }
 
     /**

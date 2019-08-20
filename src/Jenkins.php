@@ -174,8 +174,8 @@ class Jenkins
 
         $jobs = array();
         foreach ($this->jenkins->jobs as $job) {
-            $jobs[$job->name] = array(
-                'name' => $job->name
+            $jobs[$job->fullName] = array(
+                'name' => $job->fullName
             );
         }
 
@@ -191,7 +191,7 @@ class Jenkins
 
         $jobs = array();
         foreach ($this->jenkins->jobs as $job) {
-            $jobs[$job->name] = $this->getJob($job->name);
+            $jobs[$job->fullName] = $this->getJob($job->fullName);
         }
 
         return $jobs;
@@ -241,6 +241,8 @@ class Jenkins
      */
     public function launchJob($jobName, $parameters = array())
     {
+        $jobName = self::parseJobName($jobName);
+
         if (0 === count($parameters)) {
             $url = sprintf('%s/job/%s/build', $this->baseUrl, $jobName);
         } else {
@@ -275,6 +277,8 @@ class Jenkins
      */
     public function getJob($jobName)
     {
+        $jobName = self::parseJobName($jobName);
+
         $url  = sprintf('%s/job/%s/api/json', $this->baseUrl, $jobName);
         $curl = curl_init($url);
 
@@ -307,6 +311,8 @@ class Jenkins
      */
     public function deleteJob($jobName)
     {
+        $jobName = self::parseJobName($jobName);
+
         $url  = sprintf('%s/job/%s/doDelete', $this->baseUrl, $jobName);
         $curl = curl_init($url);
 
@@ -420,6 +426,9 @@ class Jenkins
         if ($tree !== null) {
             $tree = sprintf('?tree=%s', $tree);
         }
+
+        $job = self::parseJobName($job);
+
         $url  = sprintf('%s/job/%s/%d/api/json%s', $this->baseUrl, $job, $buildId, $tree);
         $curl = curl_init($url);
 
@@ -448,6 +457,8 @@ class Jenkins
      */
     public function getUrlBuild($job, $buildId)
     {
+        $job = self::parseJobName($job);
+
         return (null === $buildId) ?
             $this->getUrlJob($job)
             : sprintf('%s/job/%s/%d', $this->baseUrl, $job, $buildId);
@@ -496,6 +507,8 @@ class Jenkins
      */
     public function getUrlJob($job)
     {
+        $job = self::parseJobName($job);
+
         return sprintf('%s/job/%s', $this->baseUrl, $job);
     }
 
@@ -522,6 +535,8 @@ class Jenkins
      */
     public function retrieveXmlConfigAsString($jobname)
     {
+        $jobname = self::parseJobName($jobname);
+
         return $this->getJobConfig($jobname);
     }
 
@@ -533,6 +548,8 @@ class Jenkins
      */
     public function setConfigFromDomDocument($jobname, \DomDocument $document)
     {
+        $jobname = self::parseJobName($jobname);
+
         $this->setJobConfig($jobname, $document->saveXML());
     }
 
@@ -544,6 +561,8 @@ class Jenkins
      */
     public function createJob($jobname, $xmlConfiguration)
     {
+        $jobname = self::parseJobName($jobname);
+
         $url  = sprintf('%s/createItem?name=%s', $this->baseUrl, $jobname);
         $curl = curl_init($url);
         curl_setopt($curl, \CURLOPT_POST, 1);
@@ -577,6 +596,8 @@ class Jenkins
      */
     public function setJobConfig($jobname, $configuration)
     {
+        $jobname = self::parseJobName($jobname);
+
         $url  = sprintf('%s/job/%s/config.xml', $this->baseUrl, $jobname);
         $curl = curl_init($url);
         curl_setopt($curl, \CURLOPT_POST, 1);
@@ -601,6 +622,8 @@ class Jenkins
      */
     public function getJobConfig($jobname)
     {
+        $jobname = self::parseJobName($jobname);
+
         $url  = sprintf('%s/job/%s/config.xml', $this->baseUrl, $jobname);
         $curl = curl_init($url);
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
@@ -725,6 +748,8 @@ class Jenkins
      */
     public function getConsoleTextBuild($jobname, $buildNumber)
     {
+        $jobname = self::parseJobName($jobname);
+
         $url  = sprintf('%s/job/%s/%s/consoleText', $this->baseUrl, $jobname, $buildNumber);
         $curl = curl_init($url);
         curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
@@ -742,6 +767,8 @@ class Jenkins
      */
     public function getTestReport($jobName, $buildId)
     {
+        $jobName = self::parseJobName($jobName);
+
         $url  = sprintf('%s/job/%s/%d/testReport/api/json', $this->baseUrl, $jobName, $buildId);
         $curl = curl_init($url);
 
@@ -836,5 +863,40 @@ class Jenkins
         if ($info['http_code'] === 403) {
             throw new \RuntimeException(sprintf('Access Denied [HTTP status code 403] to %s"', $info['url']));
         }
+    }
+
+    /**
+     * Converts a job name containting '/job/' between every word
+     * 
+     * @param string $jobName
+     * 
+     * @return string
+     */
+    private static function parseJobName($jobName)
+    {
+        // Example:
+        // 'Github/my-project/master' --> 'Github/job/my-project/job/master'
+
+        if (strpos($jobName, '/') !== false) {
+
+            $new = [];
+            $parts = explode('/', $jobName);
+            $last = count($parts) - 1;
+
+            foreach ($parts as $i => $part) {
+                
+                $next = $i + 1;
+                $new[] = $part;
+
+                // add an extra job-item after, if next isn't a 'job' already and if it's not the last
+                if ($part !== 'job' && $i < $last && isset($parts[$next]) && $parts[$next] !== 'job') {
+                    $new[] = 'job';
+                }
+            }
+
+            $jobName = implode('/', $new);
+        }
+
+        return $jobName;
     }
 }
