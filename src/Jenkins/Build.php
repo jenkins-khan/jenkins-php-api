@@ -65,19 +65,19 @@ class Build
     {
         $parameters = array();
 
-        if (!property_exists($this->build->actions[0], 'parameters')) {
-            return $parameters;
-        }
-
-        foreach ($this->build->actions[0]->parameters as $parameter) {
-            $parameters[$parameter->name] = $parameter->value;
+        foreach ($this->build->actions as $action) {
+            if (property_exists($action, 'parameters')) {
+                foreach ($action->parameters as $parameter) {
+                    $parameters[$parameter->name] = $parameter->value;
+                }
+            }
         }
 
         return $parameters;
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getTimestamp()
     {
