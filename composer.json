@@ -1,5 +1,5 @@
 {
-  "name": "jenkins-khan/jenkins-api",
+  "name": "taxaos/jenkins-api",
   "type": "library",
   "description": "Jenkins PHP API",
   "keywords": ["jenkins", "api"],
