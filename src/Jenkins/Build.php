@@ -77,7 +77,7 @@ class Build
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getTimestamp()
     {
