@@ -1,13 +1,16 @@
 {
-  "name": "jenkins-khan/jenkins-api",
+  "name": "didungar/jenkins-api",
   "type": "library",
   "description": "Jenkins PHP API",
-  "keywords": ["jenkins", "api"],
-  "homepage": "https://github.com/jenkins-khan/jenkins-php-api",
+  "keywords": [
+    "jenkins",
+    "api"
+  ],
+  "homepage": "https://github.com/didungar/jenkins-php-api",
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "JenkinsKhan\\": "src/"
+      "DidUngar\\": "src/"
     }
   },
   "require-dev": {
@@ -18,8 +21,8 @@
   },
   "authors": [
     {
-      "name": "jenkins-khan",
-      "homepage": "https://github.com/jenkins-khan/jenkins-php-api"
+      "name": "didungar",
+      "homepage": "https://github.com/didungar/jenkins-php-api"
     }
   ]
 }
