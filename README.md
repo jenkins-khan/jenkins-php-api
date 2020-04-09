@@ -19,6 +19,12 @@ Then, run the Composer command to install the latest version:
 composer.phar require didungar/jenkins-api
 ```
 
+On error "minimum-stability" declare repository :
+```json
+"repositories": [
+        { "type": "vcs", "url": "https://github.com/didungar/jenkins-php-api" }
+    ],
+```
 
 Basic Usage
 -----------
