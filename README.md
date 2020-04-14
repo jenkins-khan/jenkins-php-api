@@ -16,9 +16,15 @@ curl -sS https://getcomposer.org/installer | php
 Then, run the Composer command to install the latest version:
 
 ```bash
-composer.phar require jenkins-khan/jenkins-api
+composer.phar require didungar/jenkins-api
 ```
 
+On error "minimum-stability" declare repository :
+```json
+"repositories": [
+        { "type": "vcs", "url": "https://github.com/didungar/jenkins-php-api" }
+    ],
+```
 
 Basic Usage
 -----------
@@ -28,7 +34,7 @@ Before anything, you need to instantiate the client :
 
 
 ```php
-    $jenkins = new \JenkinsKhan\Jenkins('http://host.org:8080');
+    $jenkins = new \DidUngar\Jenkins('http://host.org:8080');
 ```
 
 If your Jenkins needs authentication, you need to pass a URL like this : `'http://user:token@host.org:8080'`.

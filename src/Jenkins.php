@@ -1,6 +1,6 @@
 <?php
 
-namespace JenkinsKhan;
+namespace DidUngar;
 
 class Jenkins
 {
@@ -217,7 +217,7 @@ class Jenkins
 
             $this->validateCurl(
                 $curl,
-                sprintf( 'Error during getting information for executors[%s@%s] on %s', $i, $computer, $this->baseUrl)
+                sprintf('Error during getting information for executors[%s@%s] on %s', $i, $computer, $this->baseUrl)
             );
 
             $infos = json_decode($ret);
@@ -270,7 +270,7 @@ class Jenkins
     /**
      * @param string $jobName
      *
-     * @return bool|\JenkinsKhan\Jenkins\Job
+     * @return bool|\DidUngar\Jenkins\Job
      * @throws \RuntimeException
      */
     public function getJob($jobName)
@@ -619,7 +619,10 @@ class Jenkins
     public function stopExecutor(Jenkins\Executor $executor)
     {
         $url = sprintf(
-            '%s/computer/%s/executors/%s/stop', $this->baseUrl, $executor->getComputer(), $executor->getNumber()
+            '%s/computer/%s/executors/%s/stop',
+            $this->baseUrl,
+            $executor->getComputer(),
+            $executor->getNumber()
         );
 
         $curl = curl_init($url);
@@ -666,7 +669,6 @@ class Jenkins
             $curl,
             sprintf('Error during stopping job queue #%s', $queue->getId())
         );
-
     }
 
     /**
@@ -749,7 +751,10 @@ class Jenkins
         $ret = curl_exec($curl);
 
         $errorMessage = sprintf(
-            'Error during getting information for build %s#%d on %s', $jobName, $buildId, $this->baseUrl
+            'Error during getting information for build %s#%d on %s',
+            $jobName,
+            $buildId,
+            $this->baseUrl
         );
 
         $this->validateCurl(
@@ -794,7 +799,8 @@ class Jenkins
     public function getComputers()
     {
         $return = $this->execute(
-            '/computer/api/json', array(
+            '/computer/api/json',
+            array(
                 \CURLOPT_RETURNTRANSFER => 1,
             )
         );
@@ -826,8 +832,8 @@ class Jenkins
      * @param $curl
      * @param $errorMessage
      */
-    private function validateCurl($curl, $errorMessage) {
-
+    private function validateCurl($curl, $errorMessage)
+    {
         if (curl_errno($curl)) {
             throw new \RuntimeException($errorMessage);
         }
