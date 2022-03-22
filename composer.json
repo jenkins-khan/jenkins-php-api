@@ -1,9 +1,9 @@
 {
-  "name": "jenkins-khan/jenkins-api",
+  "name": "engaged-nation/jenkins-api",
   "type": "library",
   "description": "Jenkins PHP API",
   "keywords": ["jenkins", "api"],
-  "homepage": "https://github.com/jenkins-khan/jenkins-php-api",
+  "homepage": "https://github.com/Engaged-Nation/jenkins-php-api.git",
   "license": "MIT",
   "autoload": {
     "psr-4": {
