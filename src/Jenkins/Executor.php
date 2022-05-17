@@ -66,7 +66,7 @@ class Executor
     {
         $number = null;
         if (isset($this->executor->currentExecutable)) {
-            $number = $this->executor->currentExecutable->number;
+            $number = $this->executor->number;
         }
 
         return $number;
